@@ -8,9 +8,9 @@ The code in this repo is somewhat 'quick and dirty'. The goal is to develop this
 1. Download this repo as a zip file and either
     - copy it to your personal environment and make sure `pandas`, `geopandas` and `py7zr` are installed OR
     - install a new local environment using [poetry](https://python-poetry.org/) or [uv](https://docs.astral.sh/uv/).
-2. Download the Dutch soil map from the [PDOK website](service.pdok.nl/bzk/bro-bodemkaart/atom/downloads/BRO_DownloadBodemkaart.gpkg) and put it in `data/raw/`.
+2. Download the Dutch soil map from the [PDOK website](https://service.pdok.nl/bzk/bro-bodemkaart/atom/downloads/BRO_DownloadBodemkaart.gpkg) and put it in `data/raw/`.
 3. Download the [BOFEK clustering](https://www.wur.nl/nl/show/bofek-2020-gis-1.htm) and put the zip-file in `data/raw/`.
-4. Download the [scripts](www.wur.nl/nl/show/bofek2020_v1.0_scripts.zip.htm) used for the BOFEK clustering and put them in `data/raw/`.
+4. Download the [scripts](https://www.wur.nl/nl/show/bofek2020_v1.0_scripts.zip.htm) used for the BOFEK clustering and put them in `data/raw/`.
 5. The names of the Staring soil classes are shipped within this repo and are derived from Heinen et al. (2020).
 6. Run `python process.py` in the terminal. The result is a CSV file in `data/processed`.
 
