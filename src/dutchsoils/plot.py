@@ -1,10 +1,7 @@
-import os
-import warnings
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pedon as pe
-import pandas as pd
 
 
 # Set default colors for each soil type
@@ -65,27 +62,20 @@ COLORS_SOILGROUPS = {
 }
 
 
-def soilprofile(soil_index=None, bofek_cluster=None, merge_layers=False):
-    # Read database
-    alldata = pd.read_csv(
-        os.path.join("data", "processed", "soilprofiles_BodemkaartBofek.csv"),
-        sep=",",
-    )
+def soilprofile(soilprofile, merge_layers=False):
+    """
+    Plots a soilprofile: profile, hydraulic properties and texture fractions.
+    """
 
-    # Get data for input soil or bofek cluster soil
-    if bofek_cluster is not None and bofek_cluster in alldata["bofek_cluster"].unique():
-        data = alldata.loc[
-            (alldata["bofek_cluster"] == bofek_cluster) & alldata["bofek_dominant"] == 1
-        ]
-        # Check if there are multiple dominant soils
-        if len(data[data["layer_number"] == 1]) > 1:
-            warnings.warn(
-                f"Multiple dominant soils found for bofek_cluster {bofek_cluster}. Using first one."
-            )
-            data = data.drop_duplicates(subset=["layer_number"], keep="first")
+    # Get data
+    data = soilprofile.get_data()
+    data = data.set_index("layer_number")
+
+    # Get title of plot for input soil or bofek cluster soil
+    if soilprofile.bofek_cluster is not None:
         title = (
             "Bofek cluster "
-            + str(bofek_cluster)
+            + str(soilprofile.bofek_cluster)
             + ": "
             + str(data["bofek_name"].values[0])
             + "\nSoil "
@@ -93,20 +83,15 @@ def soilprofile(soil_index=None, bofek_cluster=None, merge_layers=False):
             + ": "
             + str(data["soil_name"].values[0])
         )
-    elif soil_index is not None and soil_index in alldata["soil_id"].unique():
-        data = alldata.loc[alldata["soil_id"] == soil_index]
-        title = "Soil " + str(soil_index) + ": " + str(data["soil_name"].values[0])
-    else:
-        m = f"Input bofek_cluster={bofek_cluster} or soil_index={soil_index} not valid."
-        raise KeyError(m)
-    title += f" ({data['bofek_area'].values[0]:.0f} ha)"
-    data = data.set_index("layer_number")
+    elif soilprofile.soil_index is not None:
+        title = f"Soil {soilprofile.soil_index}: {data['soil_name'].values[0]}"
 
     # Plot figure
     fig = plt.figure(
         figsize=(8, 5),
         layout="constrained",
     )
+
     # Use a gridspec, derive axes
     gs = mpl.gridspec.GridSpec(nrows=2, ncols=3, width_ratios=[1, 2, 1], figure=fig)
     ax1 = fig.add_subplot(gs[:, 0])
@@ -213,8 +198,8 @@ def soilprofile(soil_index=None, bofek_cluster=None, merge_layers=False):
             )
 
             # SUBPLOT 4: Soil texture
-            pclay = data.loc[layer, "layer_percentileclay"]
-            psilt = data.loc[layer, "layer_percentilesilt"]
+            pclay = data.loc[layer, "layer_pclay"]
+            psilt = data.loc[layer, "layer_psilt"]
             psand = 100 - pclay - psilt
             bot = 0
             for soilgroup, fraction in zip(
@@ -244,7 +229,7 @@ def soilprofile(soil_index=None, bofek_cluster=None, merge_layers=False):
             # SUBPLOT 5: Soil organic matter
             ax5.bar(
                 x=layer_count,
-                height=data.loc[layer, "layer_percentileorgmat"],
+                height=data.loc[layer, "layer_porgmat"],
                 width=0.8,
                 color=COLORS_SOILS[data.loc[layer, "layer_staringclassname"]],
                 edgecolor="dimgrey",
@@ -309,10 +294,12 @@ def soilprofile(soil_index=None, bofek_cluster=None, merge_layers=False):
 
     fig.suptitle(title)
 
-    return fig
+    fig.show()
+
+    return
 
 
 if __name__ == "__main__":
-    # Plot soil profile 
-    fig = soilprofile(bofek_cluster=3001, merge_layers=True)
+    # Plot soil profile
+    fig = soilprofile(bofek_cluster=1001, merge_layers=True)
     plt.show()

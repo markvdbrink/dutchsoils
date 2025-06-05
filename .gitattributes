@@ -1,0 +1,4 @@
+* text=auto
+
+*.lock text
+*.toml text
