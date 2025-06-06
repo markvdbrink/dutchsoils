@@ -1,6 +1,6 @@
 # DutchSoils - get Dutch soil data
 
-![PyPI - Version](https://img.shields.io/pypi/v/:dutchsoils)
+![PyPI - Version](https://img.shields.io/pypi/v/dutchsoils)
 
 DutchSoils is a Python package to get soil data from the Dutch Soil Map, Staring series and BOFEK clustering.
 
