@@ -149,3 +149,4 @@ def test_swapcofani():
 
 def test_plot():
     SoilProfile(bofek_cluster=3015).plot()
+    SoilProfile(soilprofile_index=1050).plot()

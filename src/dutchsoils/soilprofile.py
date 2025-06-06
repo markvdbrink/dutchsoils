@@ -59,6 +59,10 @@ class SoilProfile:
         Return pandas dataframe with the data per soil layer.
         Only the soilprofile index will be used if both
         the soilprofile index and bofek cluster are given.
+
+        Returns
+        -------
+        pandas.DataFrame
         """
 
         # Get data all profiles
@@ -80,12 +84,22 @@ class SoilProfile:
 
     def plot(self, merge_layers: bool = False) -> None:
         """
-        Plot the given soil profile.
+        Plots the soil profile using the specified visualization function.
 
-        Arguments
-        --------
-        merge_layers:
-            Merge layers that have the same properties.
+        Parameters
+        ----------
+        merge_layers : bool, optional
+            If True, adjacent soil layers with identical properties will be merged before plotting.
+            If False (default), all layers are plotted as-is.
+
+        Returns
+        -------
+        matplotlib.pyplot.Figure
+
+        Notes
+        -----
+        This method provides a visual representation of the soil profile, which can help in analyzing
+        layer structure and properties. The actual plotting is delegated to the `plot_soilprofile` function.
         """
 
         plot_soilprofile(self, merge_layers=merge_layers)
@@ -95,7 +109,8 @@ class SoilProfile:
         discretisation_depths: list,
         discretisation_compheights: list,
     ):
-        """Create a SOILPROFILE table.
+        """
+        Returns a dictionary as input for a SOILPROFILE table in pySWAP.
 
         Parameters
         ----------
@@ -200,8 +215,10 @@ class SoilProfile:
         self,
         ksatexm: Series | None = None,
         h_enpr: Series | None = None,
-    ):
+    ) -> dict:
         """
+        Returns a dictionary for the SOILHYDRFUNC table in pySWAP.
+
         ksatexm : list
             List of measured saturated hydraulic conductivities (cm/d).
             If not provided, it will be set equal to ksatfit.
@@ -214,10 +231,10 @@ class SoilProfile:
         data = self.get_data()
 
         # Define a dictionary
-        soilhydro_table = {}
+        result = {}
 
         # Add given information or data from the database
-        soilhydro_table.update(
+        result.update(
             {
                 "ORES": data["layer_wcres"],
                 "OSAT": data["layer_wcsat"],
@@ -233,11 +250,11 @@ class SoilProfile:
             }
         )
 
-        return soilhydro_table
+        return result
 
-    def get_swapinput_fractions(self):
+    def get_swapinput_fractions(self) -> dict:
         """
-        Returns a dictionary with SWAP input for the soil texture fractions.
+        Returns a dictionary with input for the SOILTEXTURES table in pySWAP.
         """
         # Get data
         data = self.get_data()
@@ -263,7 +280,7 @@ class SoilProfile:
 
         return result
 
-    def get_swapinput_cofani(self):
+    def get_swapinput_cofani(self) -> list:
         """
         Returns a list containing 1.0 for each soil physical layer.
         """
