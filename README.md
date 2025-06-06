@@ -1,22 +1,42 @@
-# dutchsoils - download and combine dutch (hydrological) soil data
+# DutchSoils - get Dutch soil data
 
-This repo contains code to download data of the Dutch soil map, BOFEK soil clustering and Staring series and combine these datasets.  
+![PyPI - Version](https://img.shields.io/pypi/v/:dutchsoils)
 
-The code in this repo is somewhat 'quick and dirty'. The goal is to develop this code into a small package or contribute it to [nlmod](https://github.com/gwmod/nlmod/tree/dev), but I wanted to make it public already, because it is also referenced in [pyswap](https://github.com/zawadzkim/pySWAP).
+DutchSoils is a Python package to get soil data from the Dutch Soil Map, Staring series and BOFEK clustering.
 
-## Steps
-1. Download this repo as a zip file and either
-    - copy it to your personal environment and make sure `pandas`, `geopandas` and `py7zr` are installed OR
-    - install a new local environment using [poetry](https://python-poetry.org/) or [uv](https://docs.astral.sh/uv/).
-2. Download the Dutch soil map from the [PDOK website](https://service.pdok.nl/bzk/bro-bodemkaart/atom/downloads/BRO_DownloadBodemkaart.gpkg) and put it in `data/raw/`.
-3. Download the [BOFEK clustering](https://www.wur.nl/nl/show/bofek-2020-gis-1.htm) and put the zip-file in `data/raw/`.
-4. Download the [scripts](https://www.wur.nl/nl/show/bofek2020_v1.0_scripts.zip.htm) used for the BOFEK clustering and put them in `data/raw/`.
-5. The names of the Staring soil classes are shipped within this repo and are derived from Heinen et al. (2020).
-6. Run `python process.py` in the terminal. The result is a CSV file in `data/processed`.
+It contains code to get soil texture data from the [Dutch Soil Map](https://www.wur.nl/nl/show/bodemkaart-van-nederland.htm) and combine that with the [BOFEK soil clustering](https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm) and the hydraulic parameters from the [Staring series](https://research.wur.nl/en/publications/waterretentie-en-doorlatendheidskarakteristieken-van-boven-en-ond-5).
 
-You can load this file and use pandas to filter a certain profile.  
+## Installation
 
-As an example of what you can do with this database, a plot function is given in `plot.py`. It requires `matplotlib`, `numpy` and `pedon` to be installed. If that's the case, run `python plot.py` in the terminal.
+The easiest way to install the package is through `pip`:
 
-## References
-Heinen, M., Bakker, G., & Wösten, J. H. M. (2020). Waterretentie- en doorlatendheidskarakteristieken van boven- en ondergronden in Nederland: De Staringreeks : Update 2018 [page 17]. Wageningen Environmental Research. https://doi.org/10.18174/512761
+```shell
+pip install dutchsoils
+```
+
+## Get started
+
+Getting a soil profile with the soil identification number and plotting the necessary parameters:
+
+```
+import dutchsoils as ds
+sp = ds.SoilProfile(soil_index=1050)  # Peat soil
+fig = sp.plot()
+fig.show()
+```
+
+A brief example with other options is given in `docs/examples`.
+
+## Directions
+
+- Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
+
+## Ongoing work
+
+- Add support for getting the soilprofile at a certain location (X,Y) in the Netherlands.
+- Use `pedon` for Staring series instead of the csv table.
+
+## Sources
+
+- Heinen, M., Brouwer, F., Teuling, K., & Walvoort, D. (2021). BOFEK2020 - Bodemfysische schematisatie van Nederland: Update bodemfysische eenhedenkaart. Wageningen Environmental Research. https://doi.org/10.18174/541544
+- Heinen, M., Bakker, G., & Wösten, J. H. M. (2020). Waterretentie- en doorlatendheidskarakteristieken van boven- en ondergronden in Nederland: De Staringreeks : Update 2018 [page 17]. Wageningen Environmental Research. https://doi.org/10.18174/512761

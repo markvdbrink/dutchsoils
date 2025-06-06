@@ -62,9 +62,34 @@ COLORS_SOILGROUPS = {
 }
 
 
-def soilprofile(soilprofile, merge_layers=False):
+def soilprofile(
+    soilprofile,
+    merge_layers=False,
+) -> plt.Figure:
     """
-    Plots a soilprofile: profile, hydraulic properties and texture fractions.
+    Plot a comprehensive visualization of a soil profile, including profile layers, hydraulic properties, texture fractions, and organic matter content.
+    This function generates a multi-panel matplotlib figure summarizing key properties of a given soil profile. The visualization includes:
+        - A bar plot of soil layers with Staring class labels.
+        - Soil water retention and hydraulic conductivity curves for each unique layer.
+        - Stacked bar plots of particle size fractions (clay, silt, sand) per layer.
+        - Bar plots of organic matter content per layer.
+
+    Parameters
+    ----------
+    soilprofile : SoilProfile
+        An object representing the soil profile, expected to provide a `get_data()` method returning a DataFrame with required soil properties.
+    merge_layers : bool, optional
+        If True, visually merges consecutive layers with identical Staring class names in the profile plot (default: False).
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The matplotlib Figure object containing the generated plots.
+
+    Example
+    -------
+    >>> fig = soilprofile(my_soilprofile, merge_layers=True)
+    >>> fig.show()
     """
 
     # Get data
@@ -83,8 +108,8 @@ def soilprofile(soilprofile, merge_layers=False):
             + ": "
             + str(data["soil_name"].values[0])
         )
-    elif soilprofile.soil_index is not None:
-        title = f"Soil {soilprofile.soil_index}: {data['soil_name'].values[0]}"
+    elif soilprofile.soilprofile_index is not None:
+        title = f"Soil {soilprofile.soilprofile_index}: {data['soil_name'].values[0]}"
 
     # Plot figure
     fig = plt.figure(
@@ -294,9 +319,7 @@ def soilprofile(soilprofile, merge_layers=False):
 
     fig.suptitle(title)
 
-    fig.show()
-
-    return
+    return fig
 
 
 if __name__ == "__main__":
