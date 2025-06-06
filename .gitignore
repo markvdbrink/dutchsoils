@@ -41,3 +41,6 @@ dmypy.json
 
 # PyPI configuration file
 .pypirc
+
+# VScode
+.vscode/
