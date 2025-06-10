@@ -195,7 +195,10 @@ def soilprofile(
         # Because of duplicates: plot if layer is not plotted yet
         layers_plotted = [line.get_label() for line in ax2.get_lines()]
         if data.loc[layer, "layer_staringclassname"] not in layers_plotted:
-            # SUBPLOT 2: Soil water retention curve
+            # Define range of pressure heads
+            h = np.logspace(-3, 10, 1000) * -1
+
+            # Define pedon soilmodel
             shf = pe.Genuchten(
                 theta_r=data.loc[layer, "layer_wcres"],
                 theta_s=data.loc[layer, "layer_wcsat"],
@@ -204,10 +207,11 @@ def soilprofile(
                 k_s=data.loc[layer, "layer_ksatfit"],
                 l=data.loc[layer, "layer_VGlexp"],
             )
-            h = np.logspace(-3, 10, 1000)
+
+            # SUBPLOT 2: Soil water retention curve
             ax2.plot(
                 h,
-                shf.theta(h=h),
+                shf.theta(h=-h),  # requires positive pressure heads
                 label=data.loc[layer, "layer_staringclassname"],
                 color=COLORS_SOILS[data.loc[layer, "layer_staringclassname"]],
                 linestyle=linestyles[layer_count],
@@ -216,7 +220,7 @@ def soilprofile(
             # SUBPLOT 3: Soil hydraulic conductivity
             ax3.plot(
                 h,
-                shf.k(h=h),
+                shf.k(h=-h),  # requires positive pressure heads
                 label=data.loc[layer, "layer_staringclassname"],
                 color=COLORS_SOILS[data.loc[layer, "layer_staringclassname"]],
                 linestyle=linestyles[layer_count],
@@ -274,9 +278,9 @@ def soilprofile(
 
     # Layout subplot 2
     ax2.legend()
-    ax2.set_xscale("log")
-    ax2.set_xlim(1e-1, 1e6)
-    ax2.set_xticks(np.logspace(-1, 6, 8), [None] * 8)
+    ax2.set_xscale("symlog")
+    ax2.set_xlim(-1e-1, -1e6)
+    ax2.set_xticks(np.logspace(-1, 6, 8) * -1, [None] * 8)
     ax2.set_ylabel("Water content\n[$cm^3/cm^{3}$]")
     ax2.set_title("Soil Water Retention & Conductivity Curve", fontsize=8)
     ax2.set_axisbelow(True)
@@ -284,13 +288,12 @@ def soilprofile(
 
     # Layout subplot 3
     ax3.legend()
-    ax3.set_xscale("log")
-    ax3.set_xlim(1e-1, 1e6)
+    ax3.set_xscale("symlog")
+    ax3.set_xlim(-1e-1, -1e6)
     ax3.set_xlabel("Pressure head [cm]")
     ax3.set_yscale("log")
     ax3.set_ylim(1e-10, 1e3)
     ax3.set_ylabel("Hydraulic conductivity\n[$cm/d$]")
-    # ax3.set_title("Hydraulic Conductivity Function", fontsize=8)
     ax3.set_axisbelow(True)
     ax3.grid(color="lightgrey")
 
