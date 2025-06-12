@@ -3,7 +3,6 @@ from pathlib import Path
 
 from numpy import array, ones, diff, concatenate, searchsorted
 from pandas import (
-    Series,
     DataFrame,
     read_csv,
 )
@@ -166,10 +165,12 @@ class SoilProfile:
         )
 
         # Define the bottom z for each compartment
-        comps_zb = comps_h.cumsum()
+        comps_zb = comps_h.cumsum().astype(int)
 
         # Get bottom of the soil physical layers
-        soillay_zb = array(data["layer_zbot"]) * 100  # convert from m to cm
+        soillay_zb = (array(data["layer_zbot"]) * 100).astype(
+            int
+        )  # convert from m to cm
 
         # Intersect with the bottom of the soil physical layers
         comps_zb = array(sorted(set(soillay_zb).union(set(comps_zb))))
@@ -178,7 +179,7 @@ class SoilProfile:
         comps_zb = comps_zb[comps_zb <= sum(discretisation_depths)]
 
         # Redefine height compartments
-        comps_h = concatenate([[comps_zb[0]], diff(comps_zb)]).astype(int)
+        comps_h = concatenate([[comps_zb[0]], diff(comps_zb)])
 
         # Define corresponding soil layer for each sublayer
         comps_soillay = searchsorted(soillay_zb, comps_zb, side="left") + 1
@@ -213,8 +214,8 @@ class SoilProfile:
 
     def get_swapinput_hydraulicparams(
         self,
-        ksatexm: Series | None = None,
-        h_enpr: Series | None = None,
+        ksatexm: list | None = None,
+        h_enpr: list | None = None,
     ) -> dict:
         """
         Returns a dictionary for the SOILHYDRFUNC table in pySWAP.
