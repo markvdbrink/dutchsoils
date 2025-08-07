@@ -1,0 +1,6 @@
+layernumber,faohorizonnotation,ztop,zbottom,loamcontent,loamcontent10p,loamcontent90p,lutitecontent,lutitecontent10p,lutitecontent90p,sandmedian,sandmedian10p,sandmedian90p,siltcontent,density
+1,Ahg,0.0,0.1,75,40,90,40,25,60,140,110,170,35,0.641
+2,Cwg,0.1,0.35,90,70,100,55,40,70,110,90,130,35,1.044
+3,Cw,0.35,0.8,75,45,85,18,6,30,125,110,140,57,0.232
+4,BCb,0.8,0.95,8,5,20,2,1,4,160,140,180,6,1.545
+5,Cu,0.95,1.2,8,5,20,2,1,4,160,140,180,6,1.668

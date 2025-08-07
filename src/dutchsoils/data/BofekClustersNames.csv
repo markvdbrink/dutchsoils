@@ -1,0 +1,90 @@
+﻿# --------------------------------------------------------------------------------------------------------
+# Contents:
+# Names of the BOFEK2020 clusters.
+#
+# Source:
+# Download "Scripts clustering en bronbestanden" at https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm. This file can is a reduced version of "all_results_formatted_95.csv" at BOFEK2020_v1.0_scripts\3_Clustering\Output.
+#
+# Date:
+# 2025-08-05
+# --------------------------------------------------------------------------------------------------------
+cluster,name
+1001,Dikke veengronden: kleiig moerige bovengrond op bosveen
+1002,Dunne veengronden: moerige bovengrond op veen op zand zonder podzol
+1003,Dunne veengronden: moerige bovengrond op veen op klei
+1004,Dunne veengronden: kleiig moerige bovengrond op veen op klei
+1005,Dunne veengronden: zand-ige- bovengrond op veen op zand zonder podzol
+1006,Dikke veengronden (kleiig) moerige bovengrond op veenmosveen
+1007,Dikke veengronden zandige bovengrond op zeggeveen
+1008,Dunne veengronden: kleibovengrond op veen op zand I
+1009,Veenafbraakgebied (alleen in NOP)
+1010,Dikke veengronden: moerige bovengrond op zeggeveen
+1011,Dunne veengronden: veenkoloniaal dek op veen op zand met podzol
+1012,Dikke veengronden: kleibovengrond op bos-/zeggeveen
+1013,Dunne veengronden: moerige bovengrond op veen op zand met podzol
+1014,Dunne veengronden: zandbovengrond op veen op zand met podzol
+1015,Dikke veengronden: klei-ig- dek op veenmosveen
+1016,Dunne veengronden: kleibovengrond op veen op zand II
+1017,Dunne veengronden: kleiige bovengrond op veen op zand
+1018,Dikke veengronden: kleidek op bos-/zeggeveen of klei
+2001,Moerige gronden met zanddek
+2002,Moerige gronden met veenkoloniaal dek
+2003,Moerige gronden: met kleiondergrond
+2004,Moerige gronden met kleidek en zandondergrond (Flevoland)
+2005,Moerige gronden met kleidek en zandondergrond
+2006,Moerige gronden met moerige bovengrond I
+2007,Moerige gronden met moerige bovengrond II
+3001,Zandgronden (kalkrijk) met veenondergrond
+3002,Sterk lemige zandgronden met kleidek (eerdgronden en vaaggronden in zeezand)
+3003,Grofzandige zandgronden I
+3004,Sterk lemige zandgronden I
+3005,Sterk lemige enkeerdgronden
+3006,Grofzandige zandgronden II
+3007,Zwak lemige zandgronden met cultuurdek
+3008,Zwak lemige zandgronden met oude-kleiondergrond
+3009,Zwak lemige zandgronden I
+3010,Grofzandige zandgronden met kleidek
+3011,Zwak lemige zandgronden met kleidek (vaaggronden)
+3012,Zwak lemige enkeerdgronden
+3013,Zwak lemige enkeerdgronden of cultuurdek (Kust)
+3014,Zwak lemige zandgronden II
+3015,Zwak lemige zandgronden III
+3016,Sterk lemige zandgronden II
+3017,Grofzandige zandgronden met kleiondergrond
+3018,Sterk lemige enkeerdgronden met oude-kleiondergrond
+3019,Zwak lemige zandgronden IV
+3020,Sterk lemige zandgronden met oude-kleiondergrond
+3021,Sterk lemige zandgronden III
+3022,Sterk lemige zandgronden met kleidek (vaaggronden in dekzand)
+3023,Zwak lemige zandgronden met kleidek (podzol- en eerdgronden)
+4001,Knipkleigronden (zavel en lichte klei)
+4002,Kleigronden (klei) op  veen
+4003,Kleigronden (klei) op  homogene ondergrond (soms met veen) I
+4004,Kleigronden (ichte zavel) op homogene ondergrond I
+4005,Kleigronden (klei) met veentussenlaag
+4006,Kleigronden (zavel) op  veenondergrond
+4007,Kleigronden (-zware- klei) homogeen of op zware klei tussenlaag of op veen
+4008,Kleigronden (klei) op zandondergrond I
+4009,Kleigronden (zavel) op zandondergrond I
+4010,Kleigronden (-zware- klei) op zware kleitussenlaag of zware kleiondergrond
+4011,Kleigronden (zware zavel) op homogene ondergrond (soms met veen) I
+4012,Kleigronden (klei) op zandondergrond II
+4013,Oude kleigronden (zware zavel en klei)
+4014,Kleigronden (klei) op  homogene ondergrond (soms met veen) II
+4015,Kleigronden (-zware -klei) op  veen
+4016,Kleigronden (zavel en lichte klei) op homogene ondergrond
+4017,Oude kleigronden (lichte  zavel op grof zand)
+4018,Kleigronden (zware zavel) op homogene ondergrond (soms met veen) II
+4019,Kleigronden (lichte zavel) op homogene ondergrond II
+4020,Kleigronden (zware zavel) op homogene ondergrond (soms met zand)
+4021,Knipkleigronden (zware klei) en kleigronden met katteklei
+4022,Kleigronden (zavel) op zandondergrond II
+4023,Kleigronden (lichte zavel) op homogene ondergrond III
+4024,Kleigronden (zavel) op zandondergrond III
+5001,Keileemgronden
+5002,Kalksteenverweringsgronden
+5003,Tertiaire kleigronden
+5004,Leemgronden: zandige leem zonder briklaag
+5005,Leemgronden: zandige leem met briklaag
+5006,Leemgronden met esdek
+5007,Leemgronden: siltige leem

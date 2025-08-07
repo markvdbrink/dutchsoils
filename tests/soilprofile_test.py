@@ -7,43 +7,104 @@ from pandas import read_csv, DataFrame
 from dutchsoils import SoilProfile
 
 
-def test_getdata_correctinput():
+def test_initialisation_soilprofile_correctinput():
     # soil id
-    data_test = SoilProfile(soilprofile_index=90110280).get_data()
-    path = Path(__file__).parent / "data/soil_id_90110280.csv"
-    data_ref = read_csv(path)
-    assert_frame_equal(
-        data_test,
-        data_ref,
-        check_dtype=False,
-    )
+    SoilProfile(soilprofile_index=90110280)
 
     # bofek cluster
-    data_test = SoilProfile(bofek_cluster=3002).get_data()
-    path = Path(__file__).parent / "data/bofek_cluster_3002.csv"
-    data_ref = read_csv(path)
-    assert_frame_equal(
-        data_test,
-        data_ref,
-        check_dtype=False,
-    )
+    SoilProfile(bofek_cluster=3002)
 
 
-def test_getdata_wronginput():
+def test_initialisation_soilprofile_wronginput():
     # Test with incorrect input: no input
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile().get_data()
-    assert "No data available" in str(exc_info.value)
+        SoilProfile()
+    assert "Provide either a soilprofile index or a bofek cluster number." in str(
+        exc_info.value
+    )
+
+    # Test with incorrect input: too much input
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(bofek_cluster=1001, soilprofile_index=1001)
+    assert (
+        "Provide either a soilprofile index or a bofek cluster number, not both."
+        in str(exc_info.value)
+    )
 
     # Test with incorrect input: wrong soil id
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile(soilprofile_index=999999).get_data()
-    assert "No data available" in str(exc_info.value)
+        SoilProfile(soilprofile_index=999999)
+    assert "Given soilprofile index 999999 does not exist." in str(exc_info.value)
 
     # Test with incorrect input: wrong bofek
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile(bofek_cluster=999999).get_data()
-    assert "No data available" in str(exc_info.value)
+        SoilProfile(bofek_cluster=999999)
+    assert "Given bofek cluster number 999999 does not exist." in str(exc_info.value)
+
+
+def test_getdatahorizons():
+    # Get soilprofile
+    sp = SoilProfile(bofek_cluster=1008)
+
+    # Test which=all
+    # Data to test
+    data_test = sp.get_data_horizons()
+    # Reference data
+    path = Path(__file__).parent / "data/soilprofile90110280_horizondata_all.csv"
+    data_ref = read_csv(path)
+    # Test
+    assert_frame_equal(
+        data_test,
+        data_ref,
+        check_dtype=False,
+    )
+
+    # Test which=hydraulic
+    # Data to test
+    data_test = sp.get_data_horizons(which="hydraulic")
+    # Reference data
+    path = Path(__file__).parent / "data/soilprofile90110280_horizondata_hydraulic.csv"
+    data_ref = read_csv(path)
+    # Test
+    assert_frame_equal(
+        data_test,
+        data_ref,
+        check_dtype=False,
+    )
+
+    # Test which=physical
+    # Data to test
+    data_test = sp.get_data_horizons(which="physical")
+    # Reference data
+    path = Path(__file__).parent / "data/soilprofile90110280_horizondata_physical.csv"
+    data_ref = read_csv(path)
+    # Test
+    assert_frame_equal(
+        data_test,
+        data_ref,
+        check_dtype=False,
+    )
+
+    # Test which=chemical
+    # Data to test
+    data_test = sp.get_data_horizons(which="chemical")
+    # Reference data
+    path = Path(__file__).parent / "data/soilprofile90110280_horizondata_chemical.csv"
+    data_ref = read_csv(path)
+    # Test
+    assert_frame_equal(
+        data_test,
+        data_ref,
+        check_dtype=False,
+    )
+
+    # Test which=wrong
+    with pytest.raises(ValueError) as exc_info:
+        sp.get_data_horizons(which="wrong")
+    assert (
+        "Unvalid value for 'which': wrong. Choose between 'all', 'hydraulic', 'physical', 'chemical'."
+        in str(exc_info.value)
+    )
 
 
 def test_swapsoilprofile():
@@ -120,10 +181,6 @@ def test_swapfractions():
 
     # Get output to test
     frac_test = DataFrame(sp.get_swapinput_fractions())
-
-    print(frac_ref)
-    print("\n")
-    print(frac_test)
 
     # Test if frames are equal
     assert_frame_equal(

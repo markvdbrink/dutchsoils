@@ -1,0 +1,6 @@
+layernumber,faohorizonnotation,ztop,zbottom,staringseriesblock,wcres,wcsat,vgmalpha,vgmnpar,vgmlambda,ksatfit,staringblockdescription,staringblocklabel
+1,Ahg,0.0,0.1,B17,0.0,0.71862598,0.01906191,1.1366583,0.0001,4.48373535,venige klei,venige klei
+2,Cwg,0.1,0.35,O13,0.01,0.573268,0.02785405,1.07995207,-6.09131057,9.68929074,zeer zware klei,z.zw. klei
+3,Cw,0.35,0.8,O17,0.01,0.84863548,0.01192909,1.27153561,-1.24929996,3.40200949,mesotroof en eutroof veen,meso-eutroof veen
+4,BCb,0.8,0.95,O01,0.01,0.36584689,0.01598691,2.16275113,2.8679672,22.32215442,leemarm zeer fijn tot matig fijn zand,leemarm z.f.-m.f. zand
+5,Cu,0.95,1.2,O01,0.01,0.36584689,0.01598691,2.16275113,2.8679672,22.32215442,leemarm zeer fijn tot matig fijn zand,leemarm z.f.-m.f. zand
