@@ -1,6 +1,6 @@
 # DutchSoils - get Dutch soil data
 
-![PyPI - Version](https://img.shields.io/pypi/v/:dutchsoils)
+![PyPI - Version](https://img.shields.io/pypi/v/dutchsoils)
 
 DutchSoils is a Python package to get soil data from the Dutch Soil Map, Staring series and BOFEK clustering.
 
@@ -20,9 +20,8 @@ Getting a soil profile with the soil identification number and plotting the nece
 
 ```
 import dutchsoils as ds
-sp = ds.SoilProfile(soil_index=1050)  # Peat soil
-fig = sp.plot()
-fig.show()
+sp = ds.SoilProfile(soilprofile_index=1050)  # Peat soil
+sp.plot()
 ```
 
 A brief example with other options is given in `docs/examples`.
