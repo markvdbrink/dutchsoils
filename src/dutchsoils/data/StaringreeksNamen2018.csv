@@ -1,0 +1,47 @@
+# --------------------------------------------------------------------------------------------------------
+# Contents:
+# The names and legend lables of the different Staring series blocks.
+#
+# Source:
+# Heinen, M., Bakker, G., & Wösten, J. H. M. (2020). Waterretentie- en doorlatendheidskarakteristieken van boven- en ondergronden in Nederland: De Staringreeks : Update 2018 [page 17]. Wageningen Environmental Research. https://doi.org/10.18174/512761
+#
+# Date:
+# 2025-08-05
+# --------------------------------------------------------------------------------------------------------
+staringseriesblock,staringblockdescription,staringblocklabel
+101,leemarm zeer fijn tot matig fijn zand,leemarm z.f.-m.f. zand
+102,zwak lemig zeer fijn tot matig fijn zand,zw. lemig z.f.-m.f. zand
+103,sterk lemig zeer fijn tot matig fijn zand,st. lemig z.f.-m.f. zand
+104,zeer sterk lemig zeer fijn tot matig fijn zand,z.st. lemig z.f.-m.f. zand
+105,grof zand,grof zand
+106,keileem,keileem
+107,zeer lichte zavel,z. licht zavel
+108,matig lichte zavel,m. lichte zavel
+109,zware zavel,zware zavel
+110,lichte klei,lichte klei
+111,matig zware klei,m.zw. klei
+112,zeer zware klei,z.zw. klei
+113,zandige leem,zandige leem
+114,siltige leem,siltige leem
+115,venig zand,venig zand
+116,zandig veen en veen,zandig veen en veen
+117,venige klei,venige klei
+118,kleiig veen,kleiig veen
+201,leemarm zeer fijn tot matig fijn zand,leemarm z.f.-m.f. zand
+202,zwak lemig zeer fijn tot matig fijn zand,zw. lemig z.f.-m.f. zand
+203,sterk lemig zeer fijn tot matig fijn zand,st. lemig z.f.-m.f. zand
+204,zeer sterk lemig zeer fijn tot matig fijn zand,z.st. lemig z.f.-m.f. zand
+205,grof zand,grof zand
+206,keileem,keileem
+207,beekleem,beekleem
+208,zeer lichte zavel,z. licht zavel
+209,matig lichte zavel,m. lichte zavel
+210,zware zavel,zware zavel
+211,lichte klei,lichte klei
+212,matig zware klei,m.zw. klei
+213,zeer zware klei,z.zw. klei
+214,zandige leem,zandige leem
+215,siltige leem,siltige leem
+216,oligotroof veen,oligotroof veen
+217,mesotroof en eutroof veen,meso-eutroof veen
+218,moerige tussenlaag,moerige tussenlaag
