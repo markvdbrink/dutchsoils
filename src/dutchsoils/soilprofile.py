@@ -1,12 +1,16 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
-import warnings
+from warnings import warn
 
 from numpy import array, ones, diff, concatenate, searchsorted
 from pandas import (
     DataFrame,
     read_csv,
 )
+from pyproj import Transformer
+from pyproj.database import query_crs_info
+from requests import get as requests_get
 
 from .plot import soilprofile as plot_soilprofile
 
@@ -25,6 +29,10 @@ class SoilProfile:
 
     Attributes
     ----------
+    index : int or None
+        Input. Soil profile index.
+    bofekcluster : int or None
+        Input. BOFEK cluster number.
     soilprofile_index : int or None
         Input. Soil profile index.
     bofek_cluster : int or None
@@ -34,15 +42,16 @@ class SoilProfile:
     Notes
     -----
     Either `soilprofile_index` or `bofek_cluster` must be provided, but not both.
-    The `name` and `area` attributes are automatically set based on the provided input.
     """
 
+    index: int | None = None
+    name: str = field(init=False)
+    bofekcluster: int | None = None
+    bofekcluster_name: str = field(init=False)
+    bofekcluster_dominant: bool = field(init=False)
+    # Deprecated attributes
     soilprofile_index: int | None = None
-    soilprofile_area: float = field(init=False)
-    soilprofile_name: str = field(init=False)
     bofek_cluster: int | None = None
-    bofek_cluster_name: str = field(init=False)
-    bofek_cluster_dominant: bool = field(init=False)
 
     def __post_init__(self):
         """
@@ -58,14 +67,31 @@ class SoilProfile:
         """
         Checks if given input parameters are valid.
         """
+
+        # Deprecation warning
+        if self.bofek_cluster:
+            warn(
+                "The use of `bofek_cluster` is deprecated and will be removed in a later version. Please use `bofekcluster`.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.bofekcluster = self.bofek_cluster
+
+        # Deprecation warning
+        if self.soilprofile_index:
+            warn(
+                "The use of `soilprofile_index` is deprecated and will be removed in a later version. Please use `index`.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.index = self.soilprofile_index
+
         # Get data all profiles
         all_profiles = self._get_data_csv("BofekClusters")
 
         # Check input parameters
         # Check if input is given
-        nr_inputs = (self.soilprofile_index is not None) + (
-            self.bofek_cluster is not None
-        )
+        nr_inputs = (self.index is not None) + (self.bofekcluster is not None)
         if nr_inputs == 0:
             m = "Provide either a soilprofile index or a bofek cluster number."
         # Check if only one input is given
@@ -73,17 +99,16 @@ class SoilProfile:
             m = "Provide either a soilprofile index or a bofek cluster number, not both."
         # Check if given soilproile index is valid
         elif (
-            self.soilprofile_index is not None
-            and self.soilprofile_index
-            not in all_profiles["normalsoilprofile_id"].values
+            self.index is not None
+            and self.index not in all_profiles["normalsoilprofile_id"].values
         ):
-            m = f"Given soilprofile index {self.soilprofile_index} does not exist."
+            m = f"Given soilprofile index {self.index} does not exist."
         # Check if given bofek cluster number is valid
         elif (
-            self.bofek_cluster is not None
-            and self.bofek_cluster not in all_profiles["cluster"].values
+            self.bofekcluster is not None
+            and self.bofekcluster not in all_profiles["cluster"].values
         ):
-            m = f"Given bofek cluster number {self.bofek_cluster} does not exist."
+            m = f"Given bofek cluster number {self.bofekcluster} does not exist."
         else:
             return
 
@@ -98,34 +123,31 @@ class SoilProfile:
         bofekclustering = self._get_data_csv(csvfile="BofekClusters")
 
         # Find dominant soilprofile_index if bofek_cluster is given
-        if self.bofek_cluster is not None:
+        if self.bofekcluster is not None:
             row = bofekclustering[
-                (bofekclustering["cluster"] == self.bofek_cluster)
+                (bofekclustering["cluster"] == self.bofekcluster)
                 & (bofekclustering["dominant"] == 1)
             ]
         # Find bofek_cluster if soilprofile_index is given
         else:
             # Find bofek_cluster
-            row = bofekclustering[
-                bofekclustering["normalsoilprofile_id"] == self.soilprofile_index
-            ]
+            row = bofekclustering[bofekclustering["normalsoilprofile_id"] == self.index]
 
         # Store index, area, and bofek dominance
-        self.soilprofile_index = row.loc[:, "normalsoilprofile_id"].values[0]
-        self.soilprofile_area = row.loc[:, "area"].values[0]
-        self.bofek_cluster = row.loc[:, "cluster"].values[0]
-        self.bofek_cluster_dominant = row.loc[:, "dominant"].values[0]
+        self.index = row.loc[:, "normalsoilprofile_id"].values[0]
+        self.bofekcluster = row.loc[:, "cluster"].values[0]
+        self.bofekcluster_dominant = row.loc[:, "dominant"].values[0].astype(bool)
 
         # Store name soilprofile
         soilnames = self._get_data_csv(csvfile="SoilProfiles")
-        self.soilprofile_name = soilnames.loc[
-            soilnames["normalsoilprofile_id"] == self.soilprofile_index, "name"
+        self.name = soilnames.loc[
+            soilnames["normalsoilprofile_id"] == self.index, "name"
         ].values[0]
 
         # Store name bofek cluster
         bofeknames = self._get_data_csv(csvfile="BofekClustersNames")
-        self.bofek_cluster_name = bofeknames.loc[
-            bofeknames["cluster"] == self.bofek_cluster, "name"
+        self.bofekcluster_name = bofeknames.loc[
+            bofeknames["cluster"] == self.bofekcluster, "name"
         ].values[0]
 
     def _get_data_csv(
@@ -142,60 +164,190 @@ class SoilProfile:
 
         # Filter profile
         if filter_profile:
-            mask = data["normalsoilprofile_id"] == self.soilprofile_index
+            mask = data["normalsoilprofile_id"] == self.index
             data = data.loc[mask].reset_index(drop=True)
 
         return data
 
-    def _get_allprofiles(self) -> DataFrame:
-        """
-        Returns a dataframe with all soil profiles.
-        """
-        # TODO add deprecation warning
+    @classmethod
+    def from_bofekcluster(
+        cls,
+        cluster: int | list | None,
+    ) -> "SoilProfile" | list["SoilProfile"]:
+        """ """
+        # Return a list of Soilprofiles if input is a list
+        if isinstance(cluster, list):
+            # Initiate SoilProfile for every cluster element
+            result = []
+            for cc in cluster:
+                try:
+                    result.append(cls(bofekcluster=cc))
+                except ValueError:
+                    # If cluster is invalid, give a warning and store a None
+                    warn(message=f"Given BOFEK cluster {cc} is invalid.", stacklevel=2)
+                    result.append(None)
+        # Else return a SoilProfile instance
+        else:
+            result = cls(bofekcluster=cluster)
 
-        path = Path(__file__).parent / "data/soilprofiles_BodemkaartBofek.csv"
-        all_profiles = read_csv(path, skiprows=12)
+        return result
 
-        return all_profiles
+    @classmethod
+    def from_index(
+        cls,
+        index: int | list | None,
+    ) -> "SoilProfile" | list["SoilProfile"]:
+        """ """
+        # Return a list of Soilprofiles if input is a list
+        if isinstance(index, list):
+            # Initiate SoilProfile for every cluster element
+            result = []
+            for ii in index:
+                # If cluster is invalid, store a None
+                try:
+                    result.append(cls(index=ii))
+                except ValueError:
+                    # If index is invalid, give a warning and store a None
+                    warn(message=f"Given index {ii} is invalid.", stacklevel=2)
+                    result.append(None)
+        # Else return a SoilProfile instance
+        else:
+            result = cls(index=index)
 
-    def get_data(self) -> DataFrame:
-        """
-        Return pandas dataframe with the data per soil layer.
-        Only the soilprofile index will be used if both
-        the soilprofile index and bofek cluster are given.
+        return result
 
-        .. deprecated:: 0.1.5
-            This function is deprecated and will be removed in version 1.0.0.
-            Please use get_data_horizons or the attributes of the soilprofile instead.
+    @classmethod
+    def from_location(
+        cls,
+        x: float | list | None,
+        y: float | list | None,
+        crs: str = "EPSG:28992",
+    ) -> "SoilProfile" | list["SoilProfile"]:
+        """ """
 
-        Returns
-        -------
-        pandas.DataFrame
-        """
+        # Check input
+        cls._check_input_location(cls, x, y, crs)
 
-        # Deprecation warning
-        warnings.warn(
-            "This function is deprecated and will be removed in version 1.0.0. Use get_data_horizons or the attributes of the soilprofile instead.",
-            DeprecationWarning,
-            stacklevel=2,
+        # In case x and y are iterables
+        try:
+            result = []
+            for xx, yy in zip(x, y):
+                # Transform coordinates if necessary
+                xxtf, yytf = cls._transform_coordinates(cls, xx, yy)
+
+                # Request index using coordinates
+                index = cls._request_index(cls, xxtf, yytf)
+
+                # Initialise SoilProfile
+                sp = cls.from_index(index)
+                result.append(sp)
+        # In case x and y are not iterables
+        except TypeError:
+            # Transform coordinates if necessary
+            xxtf, yytf = cls._transform_coordinates(cls, x, y)
+
+            # Request index using coordinates
+            index = cls._request_index(cls, xxtf, yytf)
+
+            # Initialise SoilProfile
+            result = cls.from_index(index)
+
+        return result
+
+    @classmethod
+    def _check_input_location(cls, x, y, crs):
+        # Check if x is iterable
+        try:
+            for ii, xx in enumerate(x):
+                # Check if its elements are floats or integers
+                if not isinstance(xx, (float, int)):
+                    m = f"The {ii}th element of the X-coordinates ({xx}) is neither a float or int."
+                    raise ValueError(m)
+
+            # Check if y is iterable
+            try:
+                for jj, yy in enumerate(y):
+                    # Check if its elements are floats or integers
+                    if not isinstance(yy, (float, int)):
+                        m = f"The {jj}th element of the Y-coordinates ({yy}) is neither a float or int."
+                        raise ValueError(m)
+
+                # Check if x and y have the same length
+                if len(x) != len(y):
+                    m = f"List of X and Y coordinates do not have the same length (x: {len(x)}, y: {len(y)})."
+                    raise ValueError(m)
+
+            # If y is not iterable, check if it is a float or an integer
+            except TypeError:
+                if not isinstance(y, (float, int)):
+                    m = f"The Y-coordinate ({y}) is neither a float or int."
+                    raise ValueError(m)
+
+        # If x is not iterable, check if it is a float or an integer
+        except TypeError:
+            if not isinstance(x, (float, int)):
+                m = f"The X-coordinate ({x}) is neither a float or int."
+                raise ValueError(m)
+
+        # Check if crs exists
+        crs_info_list = query_crs_info(auth_name=None, pj_types=None)
+        crs_list = ["EPSG:" + info[1] for info in crs_info_list]
+        if crs not in crs_list:
+            m = f"CRS {crs} is not valid."
+            raise ValueError
+
+        return
+
+    @classmethod
+    def _transform_coordinates(cls, xx, yy, crs):
+        # Transform coordinates to EPSG 4326 if necessary
+        if crs != "EPSG:4326":
+            transformer = Transformer.from_crs(
+                crs_from=crs,
+                crs_to="EPSG:4326",
+            )
+            xx, yy = transformer.transform(xx, yy)
+
+        return xx, yy
+
+    @classmethod
+    def _request_index(cls, xx, yy):
+        # Send request for soil data to soilphysics.wur.nl
+        r = requests_get(
+            url="https://www.soilphysics.wur.nl/soil.php",
+            params={"latitude": xx, "longitude": yy},
         )
 
-        # Get data all profiles
-        allprofiles = self._get_allprofiles()
+        # TODO what if no connection
 
-        # Make mask depending on given input
-        if self.soilprofile_index is not None:
-            mask = allprofiles["soil_id"] == self.soilprofile_index
-        elif self.bofek_cluster is not None:
-            # If bofek cluster is given, return only the dominant profile
-            mask = (allprofiles["bofek_cluster"] == self.bofek_cluster) & (
-                allprofiles["bofek_dominant"]
-            )
+        # TODO what if no data available
 
-        # Get data
-        data = allprofiles.loc[mask].reset_index(drop=True)
+        # Extract data in json format
+        data = r.json()
 
-        return data
+        # Get index
+        index = data["id"]
+
+        return index
+
+    def get_area(self, which: str = "profile") -> float:
+        """
+        Returns the total area of this profile or BOFEK2020 cluster in the Netherlands.
+
+        Parameters
+        ---------
+        which
+            Which area to return. Options (default: "profile"):
+
+                * "profile": Return the area of this profile.
+                * "bofekcluster": Return the area of the total bofekcluster.
+
+        """
+        # Check input
+
+        # Get area
+
+        return
 
     def get_data_horizons(
         self,
@@ -207,11 +359,12 @@ class SoilProfile:
         Parameters
         ----------
         which
-            Which data to return (default 'all'). Options:
-                "all": combination of hydraulic, physical and chemical data.
-                "hydraulic": Staring series data.
-                "physical": Mass fractions with a certain diameter (loam, lutite, silt), sand median and density.
-                "chemical": Organic matter, calcite, ironoxide content and acidity.
+            Which data to return (default: "all"). Options:
+
+                * "all": combination of hydraulic, physical and chemical data.
+                * "hydraulic": Staring series data.
+                * "physical": Mass fractions with a certain diameter (loam, lutite, silt), sand median and density.
+                * "chemical": Organic matter, calcite, ironoxide content and acidity.
 
         Returns
         -------
@@ -359,28 +512,6 @@ class SoilProfile:
             ]
 
         return datafil
-
-    def plot(self, merge_layers: bool = False) -> None:
-        """
-        Plots the soil profile using the specified visualization function.
-
-        Parameters
-        ----------
-        merge_layers : bool, optional
-            If True, adjacent soil layers with identical properties will be merged before plotting.
-            If False (default), all layers are plotted as-is.
-
-        Returns
-        -------
-        matplotlib.pyplot.Figure
-
-        Notes
-        -----
-        This method provides a visual representation of the soil profile, which can help in analyzing
-        layer structure and properties. The actual plotting is delegated to the `plot_soilprofile` function.
-        """
-
-        plot_soilprofile(self, merge_layers=merge_layers)
 
     def get_swapinput_profile(
         self,
@@ -564,3 +695,80 @@ class SoilProfile:
         data = self.get_data_horizons()
 
         return [1.0] * len(data.index)
+
+    def plot(self, merge_layers: bool = False) -> None:
+        """
+        Plots the soil profile using the specified visualization function.
+
+        Parameters
+        ----------
+        merge_layers : bool, optional
+            If True, adjacent soil layers with identical properties will be merged before plotting.
+            If False (default), all layers are plotted as-is.
+
+        Returns
+        -------
+        matplotlib.pyplot.Figure
+
+        Notes
+        -----
+        This method provides a visual representation of the soil profile, which can help in analyzing
+        layer structure and properties. The actual plotting is delegated to the `plot_soilprofile` function.
+        """
+
+        plot_soilprofile(self, merge_layers=merge_layers)
+
+    def _get_allprofiles(self) -> DataFrame:
+        """
+        Returns a dataframe with all soil profiles.
+        """
+        # Deprecation warning
+        warn(
+            "This function is deprecated and will be removed in a later version. Please use _get_data_csv instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        path = Path(__file__).parent / "data/soilprofiles_BodemkaartBofek.csv"
+        all_profiles = read_csv(path, skiprows=12)
+
+        return all_profiles
+
+    def get_data(self) -> DataFrame:
+        """
+        Return pandas dataframe with the data per soil layer.
+        Only the soilprofile index will be used if both
+        the soilprofile index and bofek cluster are given.
+
+        .. deprecated:: 0.1.5
+            This function is deprecated and will be removed in a later version.
+            Please use get_data_horizons or the attributes of the soilprofile instead.
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
+
+        # Deprecation warning
+        warn(
+            "This function is deprecated and will be removed in a later version. Please use get_data_horizons or the attributes of the soilprofile instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        # Get data all profiles
+        allprofiles = self._get_allprofiles()
+
+        # Make mask depending on given input
+        if self.index is not None:
+            mask = allprofiles["soil_id"] == self.index
+        elif self.bofekcluster is not None:
+            # If bofek cluster is given, return only the dominant profile
+            mask = (allprofiles["bofek_cluster"] == self.bofekcluster) & (
+                allprofiles["bofek_dominant"]
+            )
+
+        # Get data
+        data = allprofiles.loc[mask].reset_index(drop=True)
+
+        return data

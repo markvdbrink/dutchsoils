@@ -298,21 +298,19 @@ def soilprofile(
 
     # Get title of plot for input soil or bofek cluster soil
     title = (
-        "Bofek cluster "
-        + str(soilprofile.bofek_cluster)
+        "Soil profile "
+        + str(soilprofile.index)
         + ": "
-        + str(soilprofile.bofek_cluster_name)
-        + "\nSoil profile "
-        + str(soilprofile.soilprofile_index)
+        + str(soilprofile.name)
+        + "\nBofek cluster "
+        + str(soilprofile.bofekcluster)
         + ": "
-        + str(soilprofile.soilprofile_name)
+        + str(soilprofile.bofekcluster_name)
     )
+    if soilprofile.bofekcluster_dominant:
+        title += " (dominant)"
+    else:
+        title += " (not dominant)"
     fig.suptitle(title)
 
     return fig
-
-
-if __name__ == "__main__":
-    # Plot soil profile
-    fig = soilprofile(bofek_cluster=1001, merge_layers=True)
-    plt.show()

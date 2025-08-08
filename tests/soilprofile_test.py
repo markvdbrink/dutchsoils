@@ -1,4 +1,5 @@
 from pathlib import Path
+import warnings
 
 import pytest
 from pandas.testing import assert_frame_equal
@@ -7,12 +8,52 @@ from pandas import read_csv, DataFrame
 from dutchsoils import SoilProfile
 
 
+def test_from_bofekcluster():
+    # Test with correct input
+    SoilProfile.from_bofekcluster(3012)
+    SoilProfile.from_bofekcluster([3012, 1008])
+
+    # Test with incorrect input: wrong bofek
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_bofekcluster(999999)
+    assert "Given bofek cluster number 999999 does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: second element is wrong
+    with warnings.catch_warnings(record=True) as w:
+        result = SoilProfile.from_bofekcluster([3012, 999999])
+    assert len(w) == 1
+    assert "Given BOFEK cluster 999999 is invalid." in str(w[0].message)
+    assert result[1] is None
+
+
+def test_from_index():
+    # Test with correct input
+    SoilProfile.from_index(90110280)
+    SoilProfile.from_index([90110280, 3030])
+
+    # Test with incorrect input: wrong index
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_index(999999)
+    assert "Given soilprofile index 999999 does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: second element is wrong
+    with warnings.catch_warnings(record=True) as w:
+        result = SoilProfile.from_index([3030, 999999])
+    assert len(w) == 1
+    assert "Given index 999999 is invalid." in str(w[0].message)
+    assert result[1] is None
+
+
+def test_from_location():
+    pass
+
+
 def test_initialisation_soilprofile_correctinput():
     # soil id
-    SoilProfile(soilprofile_index=90110280)
+    SoilProfile(index=90110280)
 
     # bofek cluster
-    SoilProfile(bofek_cluster=3002)
+    SoilProfile(bofekcluster=3002)
 
 
 def test_initialisation_soilprofile_wronginput():
@@ -25,7 +66,7 @@ def test_initialisation_soilprofile_wronginput():
 
     # Test with incorrect input: too much input
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile(bofek_cluster=1001, soilprofile_index=1001)
+        SoilProfile(bofekcluster=1001, index=1001)
     assert (
         "Provide either a soilprofile index or a bofek cluster number, not both."
         in str(exc_info.value)
@@ -33,18 +74,27 @@ def test_initialisation_soilprofile_wronginput():
 
     # Test with incorrect input: wrong soil id
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile(soilprofile_index=999999)
+        SoilProfile(index=999999)
     assert "Given soilprofile index 999999 does not exist." in str(exc_info.value)
 
     # Test with incorrect input: wrong bofek
     with pytest.raises(ValueError) as exc_info:
-        SoilProfile(bofek_cluster=999999)
+        SoilProfile(bofekcluster=999999)
     assert "Given bofek cluster number 999999 does not exist." in str(exc_info.value)
+
+
+def test_get_area():
+    # Get soilprofile
+    sp = SoilProfile(bofekcluster=1008)
+
+    # Get area
+    sp.get_area()
+    # TODO
 
 
 def test_getdatahorizons():
     # Get soilprofile
-    sp = SoilProfile(bofek_cluster=1008)
+    sp = SoilProfile(bofekcluster=1008)
 
     # Test which=all
     # Data to test
@@ -109,7 +159,7 @@ def test_getdatahorizons():
 
 def test_swapsoilprofile():
     # Get soil profile
-    sp = SoilProfile(bofek_cluster=1001)
+    sp = SoilProfile(bofekcluster=1001)
 
     # Test for discretisation that aligns well with soil physical layering
     # Get correct dataframes
@@ -158,7 +208,7 @@ def test_swaphydraulicparams():
     hf_ref = read_csv(path)
 
     # Get soil profile
-    sp = SoilProfile(bofek_cluster=1001)
+    sp = SoilProfile(bofekcluster=1001)
 
     # Get output to test
     hf_test = DataFrame(sp.get_swapinput_hydraulicparams())
@@ -177,7 +227,7 @@ def test_swapfractions():
     frac_ref = read_csv(path)
 
     # Get soil profile
-    sp = SoilProfile(bofek_cluster=1001)
+    sp = SoilProfile(bofekcluster=1001)
 
     # Get output to test
     frac_test = DataFrame(sp.get_swapinput_fractions())
@@ -195,7 +245,7 @@ def test_swapcofani():
     cof_ref = [1.0, 1.0, 1.0, 1.0]
 
     # Get soil profile
-    sp = SoilProfile(bofek_cluster=1001)
+    sp = SoilProfile(bofekcluster=1001)
 
     # Get output to test
     cof_test = sp.get_swapinput_cofani()
@@ -205,5 +255,5 @@ def test_swapcofani():
 
 
 def test_plot():
-    SoilProfile(bofek_cluster=3015).plot()
-    SoilProfile(soilprofile_index=1050).plot()
+    SoilProfile(bofekcluster=3015).plot()
+    SoilProfile(index=1050).plot()
