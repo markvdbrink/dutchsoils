@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "dutchsoils"
-version = "0.1.4"
+version = "0.2.0"
 description = "Package to get soil profiles of the Netherlands."
 authors = [
     {name = "markvdbrink",email = "mark.vandenbrink@wur.nl"}
