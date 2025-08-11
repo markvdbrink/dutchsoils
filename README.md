@@ -23,7 +23,7 @@ Getting a soil profile with the soil identification number and plotting the nece
 
 ```
 import dutchsoils as ds
-sp = ds.SoilProfile(soilprofile_index=1050)  # Peat soil
+sp = ds.SoilProfile.from_location(x=171827, y=445436)
 sp.plot()
 ```
 
