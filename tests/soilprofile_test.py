@@ -4,6 +4,7 @@ import warnings
 import pytest
 from pandas.testing import assert_frame_equal
 from pandas import read_csv, DataFrame
+from numpy import array
 
 from dutchsoils import SoilProfile
 
@@ -16,13 +17,13 @@ def test_from_bofekcluster():
     # Test with incorrect input: wrong bofek
     with pytest.raises(ValueError) as exc_info:
         SoilProfile.from_bofekcluster(999999)
-    assert "Given bofek cluster number 999999 does not exist." in str(exc_info.value)
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
 
     # Test with incorrect input: second element is wrong
     with warnings.catch_warnings(record=True) as w:
         result = SoilProfile.from_bofekcluster([3012, 999999])
     assert len(w) == 1
-    assert "Given BOFEK cluster 999999 is invalid." in str(w[0].message)
+    assert "Given bofekcluster '999999' is invalid." in str(w[0].message)
     assert result[1] is None
 
 
@@ -34,33 +35,166 @@ def test_from_index():
     # Test with incorrect input: wrong index
     with pytest.raises(ValueError) as exc_info:
         SoilProfile.from_index(999999)
-    assert "Given soilprofile index 999999 does not exist." in str(exc_info.value)
+    assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
 
     # Test with incorrect input: second element is wrong
     with warnings.catch_warnings(record=True) as w:
         result = SoilProfile.from_index([3030, 999999])
     assert len(w) == 1
-    assert "Given index 999999 is invalid." in str(w[0].message)
+    assert "Given index '999999' is invalid." in str(w[0].message)
+    assert result[1] is None
+
+
+def test_from_code():
+    # Test with correct input
+    SoilProfile.from_code("Zn21")
+    SoilProfile.from_code(["Zn21", "bEZ23"])
+
+    # Test with incorrect input: wrong index
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_code("test")
+    assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: second element is wrong
+    with warnings.catch_warnings(record=True) as w:
+        result = SoilProfile.from_code(["Zn21", "test"])
+    assert len(w) == 1
+    assert "Given code 'test' is invalid." in str(w[0].message)
     assert result[1] is None
 
 
 def test_from_location():
-    pass
+    # Test with correct input: single location
+    sp = SoilProfile.from_location(
+        x=200234,
+        y=507675,
+    )
+    assert sp.index == 1230
+
+    # Test with correct input: single location, other CRS
+    sp = SoilProfile.from_location(
+        x=51.350794,
+        y=3.574202,
+        crs="EPSG:4326",
+    )
+    assert sp.index == 90115320
+
+    # Test with correct input: multiple locations
+    # Zuid-Limburg, Texel, Zeeland
+    x_test = [187859, 114373, 28193.4]
+    y_test = [321963, 567756, 375309.9]
+
+    sps = SoilProfile.from_location(
+        x=x_test,
+        y=y_test,
+    )
+    assert [sp.index for sp in sps] == [5030, 90110186, 90115320]
+
+    # Test with other forms of iterables
+    # np array
+    sps = SoilProfile.from_location(
+        x=array(x_test),
+        y=array(y_test),
+    )
+    assert [sp.index for sp in sps] == [5030, 90110186, 90115320]
+
+    # pd dataframe
+    df = DataFrame(index=x_test, data=y_test, columns=["y_test"])
+    sps = SoilProfile.from_location(
+        x=df.index,
+        y=df["y_test"],
+    )
+    assert [sp.index for sp in sps] == [5030, 90110186, 90115320]
+
+    # Test with incorrect input: X is list, Y not
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=x_test,
+            y=321963,
+        )
+    assert "X is iterable while Y is not." in str(exc_info.value)
+
+    # Test with incorrect input: Y is list, X not
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=187859,
+            y=y_test,
+        )
+    assert "Y is iterable while X is not." in str(exc_info.value)
+
+    # Test with incorrect input: X and Y do not have the same length
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=x_test[1:],
+            y=y_test,
+        )
+    assert (
+        "List of X and Y coordinates do not have the same length (x: 2, y: 3)."
+        in str(exc_info.value)
+    )
+
+    # Test with incorrect input: X-coordinate in list is a string
+    xx = x_test + ["test"]
+    yy = y_test + [y_test[-1]]
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=xx,
+            y=yy,
+        )
+    assert "The 3th element of the X-coordinates is neither a float or int." in str(
+        exc_info.value
+    )
+
+    # Test with incorrect input: Y-coordinate in list is a string
+    xx = x_test + [x_test[-1]]
+    yy = y_test + ["test"]
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=xx,
+            y=yy,
+        )
+    assert "The 3th element of the Y-coordinates is neither a float or int." in str(
+        exc_info.value
+    )
+
+    # Test with incorrect input: X-coordinate is a string
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x="test",
+            y=y_test[0],
+        )
+    assert "The X-coordinate 'test' is neither a float or int." in str(exc_info.value)
+
+    # Test with incorrect input: Y-coordinate is a string
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(
+            x=x_test[0],
+            y="test",
+        )
+    assert "The Y-coordinate 'test' is neither a float or int." in str(exc_info.value)
+
+    # Test with non-existing CRS
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_location(x=x_test[0], y=y_test[0], crs="test")
+    assert "CRS 'test' is not valid." in str(exc_info.value)
 
 
-def test_initialisation_soilprofile_correctinput():
+def test_initialisation_soilprofile():
+    # CORRECT INPUT
     # soil id
     SoilProfile(index=90110280)
+
+    # soil code
+    SoilProfile(code="Zn21")
 
     # bofek cluster
     SoilProfile(bofekcluster=3002)
 
-
-def test_initialisation_soilprofile_wronginput():
+    # WRONG INPUT
     # Test with incorrect input: no input
     with pytest.raises(ValueError) as exc_info:
         SoilProfile()
-    assert "Provide either a soilprofile index or a bofek cluster number." in str(
+    assert "Provide a soilprofile index or code or a bofek cluster number." in str(
         exc_info.value
     )
 
@@ -68,31 +202,40 @@ def test_initialisation_soilprofile_wronginput():
     with pytest.raises(ValueError) as exc_info:
         SoilProfile(bofekcluster=1001, index=1001)
     assert (
-        "Provide either a soilprofile index or a bofek cluster number, not both."
+        "Provide only one input: soilprofile index, code or a bofek cluster number, not multiple."
         in str(exc_info.value)
     )
 
     # Test with incorrect input: wrong soil id
     with pytest.raises(ValueError) as exc_info:
         SoilProfile(index=999999)
-    assert "Given soilprofile index 999999 does not exist." in str(exc_info.value)
+    assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: wrong soil code
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(code="test")
+    assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
 
     # Test with incorrect input: wrong bofek
     with pytest.raises(ValueError) as exc_info:
         SoilProfile(bofekcluster=999999)
-    assert "Given bofek cluster number 999999 does not exist." in str(exc_info.value)
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
 
 
 def test_get_area():
     # Get soilprofile
-    sp = SoilProfile(bofekcluster=1008)
+    sp = SoilProfile(bofekcluster=3015)
 
-    # Get area
-    sp.get_area()
-    # TODO
+    # Get area from profile
+    area = sp.get_area()
+    assert area == 186782.5653
+
+    # Get area from bofekcluster
+    area = sp.get_area(which="bofekcluster")
+    assert area == 335205.67601799994
 
 
-def test_getdatahorizons():
+def test_get_data_horizons():
     # Get soilprofile
     sp = SoilProfile(bofekcluster=1008)
 

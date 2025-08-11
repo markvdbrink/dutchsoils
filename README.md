@@ -7,7 +7,7 @@ DutchSoils is a Python package to get soil data from the Dutch Soil Map, Staring
 It contains code to get soil texture data from the [Dutch Soil Map](https://www.wur.nl/nl/show/bodemkaart-van-nederland.htm) and combine that with the [BOFEK soil clustering](https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm) and the hydraulic parameters from the [Staring series](https://research.wur.nl/en/publications/waterretentie-en-doorlatendheidskarakteristieken-van-boven-en-ond-5).
 
 > [!Note]
-> The data and soil profiles in this package are not actual field measurements but are **derived** from field measurements. It is assumed that the soil profile and associated data are typical for the soil at a certain location.
+> The data and soil profiles in this package are not actual measurements but are **derived** from field measurements. It is assumed that the soil profile and associated data are typical for the soil at a certain location.
 
 ## Installation
 
@@ -32,11 +32,6 @@ A brief example with other options is given in `docs/examples`.
 ## Directions
 
 - Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
-
-## Ongoing work
-
-- Add support for getting the soilprofile at a certain location (X,Y) in the Netherlands.
-- Use `pedon` for Staring series instead of the csv table.
 
 ## Sources
 
