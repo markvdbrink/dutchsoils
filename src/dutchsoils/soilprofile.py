@@ -79,7 +79,7 @@ class SoilProfile:
         if self.bofek_cluster:
             warn(
                 "The use of `bofek_cluster` is deprecated and will be removed in a later version. Please use `bofekcluster`.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
             self.bofekcluster = self.bofek_cluster
@@ -88,7 +88,7 @@ class SoilProfile:
         if self.soilprofile_index:
             warn(
                 "The use of `soilprofile_index` is deprecated and will be removed in a later version. Please use `index`.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
             self.index = self.soilprofile_index
@@ -936,7 +936,7 @@ class SoilProfile:
         # Deprecation warning
         warn(
             "This function is deprecated and will be removed in a later version. Please use _get_data_csv instead.",
-            DeprecationWarning,
+            FutureWarning,
             stacklevel=2,
         )
 
@@ -961,7 +961,7 @@ class SoilProfile:
         # Deprecation warning
         warn(
             "This function is deprecated and will be removed in a later version. Please use get_data_horizons or the attributes of the soilprofile instead.",
-            DeprecationWarning,
+            FutureWarning,
             stacklevel=2,
         )
 

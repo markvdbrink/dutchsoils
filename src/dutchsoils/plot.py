@@ -58,9 +58,9 @@ COLORS_SOILS = {
 
 # Set default colors for each soil group
 COLORS_SOILGROUPS = {
-    "<2µm": "#f6e0b5",  # yellow
+    ">50µm": "#f6e0b5",  # yellow
     ">2µm\n<50µm": "#80d4ff",  # light blue
-    ">50µm": "#cc99ff",  # purple
+    "<2µm": "#cc99ff",  # purple
 }
 
 
