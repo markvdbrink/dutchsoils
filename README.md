@@ -30,7 +30,7 @@ sp.plot()
 
 An example with other available options is given in `docs/examples`.
 
-## Directions
+## Feedback
 
 Feedback is always welcome!
 
