@@ -19,21 +19,29 @@ pip install dutchsoils
 
 ## Get started
 
-Getting a soil profile with the soil identification number and plotting the necessary parameters:
+Getting a soil profile with geographical coordinates, getting the data of its horizons and plotting the common parameters:
 
 ```
 import dutchsoils as ds
-sp = ds.SoilProfile.from_location(x=171827, y=445436)
+sp = ds.SoilProfile.from_location(x=171827, y=445436, crs="EPSG:28992")
+sp.get_data_horizons()
 sp.plot()
 ```
 
-A brief example with other options is given in `docs/examples`.
+An example with other available options is given in `docs/examples`.
 
 ## Directions
 
-- Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
+Feedback is always welcome!
+
+Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
+
+## Many thanks to
+- The people behind [pyOpenSci](https://www.pyopensci.org/python-package-guide/index.html), who provided an elaborate step-by-step tutorial on how to publish a Python package.
+- The developers of (among others) [pyswap](https://github.com/zawadzkim/pySWAP), [pedon](https://github.com/martinvonk/pedon), and [Artesia Water](https://github.com/ArtesiaWater), whose Python packages were a source of inspiration.
 
 ## Sources
 
+- Wageningen Environmental Research (2024). Bodemkaart van Nederland V2024-01. https://www.broloket.nl/ondergrondmodellen; downloaded on 07-08-2025.
 - Heinen, M., Brouwer, F., Teuling, K., & Walvoort, D. (2021). BOFEK2020 - Bodemfysische schematisatie van Nederland: Update bodemfysische eenhedenkaart. Wageningen Environmental Research. https://doi.org/10.18174/541544
 - Heinen, M., Bakker, G., & Wösten, J. H. M. (2020). Waterretentie- en doorlatendheidskarakteristieken van boven- en ondergronden in Nederland: De Staringreeks : Update 2018 [page 17]. Wageningen Environmental Research. https://doi.org/10.18174/512761
