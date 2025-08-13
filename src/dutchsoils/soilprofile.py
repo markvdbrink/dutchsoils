@@ -78,18 +78,18 @@ class SoilProfile:
         # Deprecation warning
         if self.bofek_cluster:
             warn(
-                "The use of `bofek_cluster` is deprecated and will be removed in a later version. Please use `bofekcluster`.",
+                "The use of `bofek_cluster` is deprecated and will be removed in a later version. Please use `bofekcluster` or the designated `from_bofekcluster` function.",
                 FutureWarning,
-                stacklevel=2,
+                stacklevel=4,
             )
             self.bofekcluster = self.bofek_cluster
 
         # Deprecation warning
         if self.soilprofile_index:
             warn(
-                "The use of `soilprofile_index` is deprecated and will be removed in a later version. Please use `index`.",
+                "The use of `soilprofile_index` is deprecated and will be removed in a later version. Please use `index` or the designated `from_index` function.",
                 FutureWarning,
-                stacklevel=2,
+                stacklevel=4,
             )
             self.index = self.soilprofile_index
 
@@ -252,7 +252,10 @@ class SoilProfile:
                     result.append(cls(**{input_type: ii}))
                 except ValueError:
                     # If cluster is invalid, give a warning and store a None
-                    warn(message=f"Given {input_type} '{ii}' is invalid.", stacklevel=2)
+                    warn(
+                        message=f"Given {input_type} '{ii}' is invalid, 'None' returned.",
+                        stacklevel=3,
+                    )
                     result.append(None)
         # Else return a SoilProfile instance
         else:
@@ -352,7 +355,7 @@ class SoilProfile:
         cls._check_input_location(x, y, crs)
 
         # In case x and y are iterables
-        try:
+        if cls._is_iterable(x) and cls._is_iterable(y):
             result = []
             for xx, yy in zip(x, y):
                 # Transform coordinates if necessary
@@ -361,21 +364,39 @@ class SoilProfile:
                 # Request index using coordinates
                 index = cls._request_index(xxtf, yytf)
 
-                # Initialise SoilProfile
-                sp = cls.from_index(index)
-                result.append(sp)
+                # Initialise SoilProfile if index is not None
+                if index is not None:
+                    sp = cls.from_index(index)
+                    result.append(sp)
+                else:
+                    # Give warning and return None
+                    warn(
+                        f"No soil information available for this location: x = {xx}, y = {yy}.",
+                        stacklevel=2,
+                    )
+                    result.append(None)
+
+            return result
+
         # In case x and y are not iterables
-        except TypeError:
+        else:
             # Transform coordinates if necessary
             xxtf, yytf = cls._transform_coordinates(x, y, crs)
 
             # Request index using coordinates
             index = cls._request_index(xxtf, yytf)
 
-            # Initialise SoilProfile
-            result = cls.from_index(index)
-
-        return result
+            # Initialise SoilProfile if index exists
+            if index is not None:
+                return cls.from_index(index)
+            # If not, give warning and return None
+            else:
+                # Give warning and return None
+                warn(
+                    f"No soil information available for this location: x = {x}, y = {y}.",
+                    stacklevel=2,
+                )
+                return
 
     @classmethod
     def _check_input_location(cls, x, y, crs):
@@ -462,16 +483,16 @@ class SoilProfile:
         return xx, yy
 
     @classmethod
-    def _request_index(cls, xx, yy):
+    def _request_index(cls, lat, long):
         """
         Requests soil profile index from soilphysics.wur.nl API for given coordinates.
 
         Parameters
         ----------
-        xx : float
-            Longitude.
-        yy : float
+        lat : float
             Latitude.
+        long : float
+            Longitude.
 
         Returns
         -------
@@ -482,7 +503,7 @@ class SoilProfile:
         # Send request for soil data to soilphysics.wur.nl
         r = requests_get(
             url="https://www.soilphysics.wur.nl/soil.php",
-            params={"latitude": xx, "longitude": yy},
+            params={"latitude": lat, "longitude": long},
         )
 
         # Extract data in json format
@@ -490,8 +511,7 @@ class SoilProfile:
 
         # Check if a soil profile is available for this location
         if data == "No soil information available for this location.":
-            # Give warning and return None
-            warn(data, stacklevel=2)
+            # Return None if not available
             return
         else:
             # Return index
@@ -936,7 +956,7 @@ class SoilProfile:
         # Deprecation warning
         warn(
             "This function is deprecated and will be removed in a later version. Please use _get_data_csv instead.",
-            FutureWarning,
+            DeprecationWarning,
             stacklevel=2,
         )
 

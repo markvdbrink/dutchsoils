@@ -23,7 +23,9 @@ def test_from_bofekcluster():
     with warnings.catch_warnings(record=True) as w:
         result = SoilProfile.from_bofekcluster([3012, 999999])
     assert len(w) == 1
-    assert "Given bofekcluster '999999' is invalid." in str(w[0].message)
+    assert "Given bofekcluster '999999' is invalid, 'None' returned." in str(
+        w[0].message
+    )
     assert result[1] is None
 
 
@@ -41,7 +43,7 @@ def test_from_index():
     with warnings.catch_warnings(record=True) as w:
         result = SoilProfile.from_index([3030, 999999])
     assert len(w) == 1
-    assert "Given index '999999' is invalid." in str(w[0].message)
+    assert "Given index '999999' is invalid, 'None' returned." in str(w[0].message)
     assert result[1] is None
 
 
@@ -59,7 +61,7 @@ def test_from_code():
     with warnings.catch_warnings(record=True) as w:
         result = SoilProfile.from_code(["Zn21", "test"])
     assert len(w) == 1
-    assert "Given code 'test' is invalid." in str(w[0].message)
+    assert "Given code 'test' is invalid, 'None' returned." in str(w[0].message)
     assert result[1] is None
 
 
@@ -79,6 +81,16 @@ def test_from_location():
     )
     assert sp.index == 90115320
 
+    # Test with location without soil profile
+    with warnings.catch_warnings(record=True) as w:
+        sp = SoilProfile.from_location(x=0, y=0)
+    assert len(w) == 1
+    assert "No soil information available for this location: x = 0, y = 0." in str(
+        w[0].message
+    )
+    assert issubclass(w[0].category, UserWarning)
+    assert sp is None
+
     # Test with correct input: multiple locations
     # Zuid-Limburg, Texel, Zeeland
     x_test = [187859, 114373, 28193.4]
@@ -89,6 +101,19 @@ def test_from_location():
         y=y_test,
     )
     assert [sp.index for sp in sps] == [5030, 90110186, 90115320]
+
+    # Test with one of the locations not having a soil profile
+    with warnings.catch_warnings(record=True) as w:
+        sp = SoilProfile.from_location(
+            x=x_test + [0],
+            y=y_test + [0],
+        )
+    assert len(w) == 1
+    assert "No soil information available for this location: x = 0, y = 0." in str(
+        w[0].message
+    )
+    assert issubclass(w[0].category, UserWarning)
+    assert sp[-1] is None
 
     # Test with other forms of iterables
     # np array
