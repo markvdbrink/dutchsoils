@@ -58,9 +58,9 @@ COLORS_SOILS = {
 
 # Set default colors for each soil group
 COLORS_SOILGROUPS = {
-    "<2µm": "#f6e0b5",  # yellow
+    ">50µm": "#f6e0b5",  # yellow
     ">2µm\n<50µm": "#80d4ff",  # light blue
-    ">50µm": "#cc99ff",  # purple
+    "<2µm": "#cc99ff",  # purple
 }
 
 
@@ -190,7 +190,7 @@ def soilprofile(
                 shf.theta(h=-h),  # requires positive pressure heads
                 label=data.loc[layer, "staringseriesblock"],
                 color=COLORS_SOILS[data.loc[layer, "staringseriesblock"]],
-                linestyle=linestyles[staring_count],
+                linestyle=linestyles[staring_count % 4],
             )
 
             # SUBPLOT 3: Soil hydraulic conductivity
@@ -199,7 +199,7 @@ def soilprofile(
                 shf.k(h=-h),  # requires positive pressure heads
                 label=data.loc[layer, "staringseriesblock"],
                 color=COLORS_SOILS[data.loc[layer, "staringseriesblock"]],
-                linestyle=linestyles[staring_count],
+                linestyle=linestyles[staring_count % 4],
             )
 
             # Increase staring blocks counter
@@ -299,8 +299,10 @@ def soilprofile(
     # Get title of plot for input soil or bofek cluster soil
     title = (
         "Soil profile "
+        + str(soilprofile.code)
+        + " ("
         + str(soilprofile.index)
-        + ": "
+        + "): "
         + str(soilprofile.name)
         + "\nBofek cluster "
         + str(soilprofile.bofekcluster)
