@@ -47,5 +47,4 @@ dev = [
     "pytest ~=8.4",
     "pre-commit ~=4.2",
     "coverage ~=7.10",
-    "coverage-badge"
 ]
