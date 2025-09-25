@@ -13,6 +13,9 @@ It contains code to get soil texture data from the [Dutch Soil Map](https://www.
 > [!Note]
 > The data and soil profiles in this package are not actual measurements but are **derived** from field measurements. It is assumed that the soil profile and associated data are typical for the soil at a certain location.
 
+> [!Note]
+> The method `from_location()` uses the API of [soilphysics.wur.nl](https://soilphysics.wur.nl) to get the soil profile at a location. This website uses the outdated soil map from 1999. Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years. If so, please do not use this method.
+
 ## Installation
 
 The easiest way to install the package is through `pip`:
@@ -41,6 +44,7 @@ Feedback is always welcome!
 Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
 
 ## Many thanks to
+- The developers of [Wageningen Environmental Research](https://soilphysics.wur.nl) for publishing and maintaining the Dutch soil map and providing an API to get the soil profile at a certain location.
 - The people behind [pyOpenSci](https://www.pyopensci.org/python-package-guide/index.html), who provided an elaborate step-by-step tutorial on how to publish a Python package.
 - The developers of (among others) [pyswap](https://github.com/zawadzkim/pySWAP), [pedon](https://github.com/martinvonk/pedon), and [Artesia Water](https://github.com/ArtesiaWater), whose Python packages were a source of inspiration.
 

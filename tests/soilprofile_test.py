@@ -84,9 +84,9 @@ def test_from_location():
     # Test with location without soil profile
     with warnings.catch_warnings(record=True) as w:
         sp = SoilProfile.from_location(x=0, y=0)
-    assert len(w) == 1
+    assert len(w) == 2
     assert "No soil information available for this location: x = 0, y = 0." in str(
-        w[0].message
+        w[1].message
     )
     assert issubclass(w[0].category, UserWarning)
     assert sp is None
@@ -108,9 +108,9 @@ def test_from_location():
             x=x_test + [0],
             y=y_test + [0],
         )
-    assert len(w) == 1
+    assert len(w) == 2
     assert "No soil information available for this location: x = 0, y = 0." in str(
-        w[0].message
+        w[1].message
     )
     assert issubclass(w[0].category, UserWarning)
     assert sp[-1] is None
