@@ -2189,4 +2189,4 @@ ipykernel = ["ipykernel"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "587de520609ead597b896368601b58fd65ac6db741d2a7a4f50e9bb1df133471"
+content-hash = "a8d9f0ad3a857efd5965d6a1d3174b91caad0cb4850477a1e5ce0b348025058b"

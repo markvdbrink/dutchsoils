@@ -12,26 +12,26 @@ authors = [
 maintainers = [
     {name = "markvdbrink",email = "mark.vandenbrink@wur.nl"}
 ]
-license = {text = "GNU General Public Licence v3.0"}
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pandas ~=2.2",
-    "pedon ~=0.0",
+    "pandas >=2.2",
+    "pedon >=0.0",
     "numpy >=1.26",
-    "requests (>=2.32.4,<3.0.0)",
-    "pyproj (>=3.7.1,<4.0.0)",
+    "requests >=2.32.4",
+    "pyproj >=3.7.1",
+    "matplotlib >=3.10",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Other Audience",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Scientific/Engineering :: Hydrology",
     "Topic :: Scientific/Engineering :: Hydrology",
     "Operating System :: OS Independent",
 ]
