@@ -21,8 +21,8 @@ class SoilProfile:
     """
     Represents a single Dutch soil profile.
 
-    Initialization Parameters
-    ------------------------
+    Parameters
+    ----------
     index : int, optional
         Soil profile index. Provide either this, `code`, or `bofekcluster`.
     code : int, optional
@@ -30,18 +30,13 @@ class SoilProfile:
     bofekcluster : int, optional
         BOFEK2020 cluster number. The dominant soil profile within this cluster will be used.
     soilprofile_index : int, optional [Deprecated]
-        Deprecated. Use `index` instead.
+        .. deprecated:: 0.1.5
+            This attribute is deprecated and will be removed in a later version.
+            Please use `index` instead.
     bofek_cluster : int, optional [Deprecated]
-        Deprecated. Use `bofekcluster` instead.
-
-    Generated Attributes
-    -------------------
-    name : str
-        Name of the soil profile.
-    bofekcluster_name : str
-        Name of the BOFEK cluster.
-    bofekcluster_dominant : bool
-        Whether the profile is dominant in the cluster.
+        .. deprecated:: 0.1.5
+            This attribute is deprecated and will be removed in a later version.
+            Please use `bofekcluster` instead.
 
     Notes
     -----
@@ -572,74 +567,74 @@ class SoilProfile:
         Returns
         -------
         pandas.Dataframe
-            Data for each soil horizon.
+            Data for each soil horizon. For further explanation of columns see https://docs.geostandaarden.nl/bro/vv-im-SGM-20220328/.
 
-        Explanation of columns (see also https://docs.geostandaarden.nl/bro/vv-im-SGM-20220328/):
-
-        layernumber
-            Horizon number, counting from top.
-        faohorizonnotation
-            Horizon type according to FAO classification (see https://www.fao.org/4/a0541e/a0541e.pdf, chapter 5)
-        ztop
-            Depth of top of the horizon (cm below surface).
-        zbottom
-            Depth of bottom of the horizon (cm below surface).
-        staringseriesblock
-            Name of staring series block.
-        organicmattercontent
-            Median organic matter content (mass-%).
-        organicmattercontent10p
-            The 10th percentile of the variation in organic matter content (mass-%).
-        organicmattercontent90p
-            The 90th percentile of the variation in organic matter content (mass-%).
-        acidity
-            Median acidity (pH).
-        acidity10p
-            The 10th percentile for the variation in acidity (pH).
-        acidity90p
-            The 90th percentile for the variation in acidity (pH).
-        cnratio
-            Ratio between carbon and nitrogen in the organic matter.
-        peattype
-            Type of peat.
-        calciccontent
-            Median calcite (CaCO3) content (mass-%).
-        fedith
-            Median Fe2O3 content (mass-%).
-        loamcontent
-            Median value of the content of mineral particles with a grain size smaller than 50 µm.
-        loamcontent10p
-            The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
-        loamcontent90p
-            The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
-        lutitecontent
-            Median value of the content of mineral particles with a grain size smaller than 2 µm.
-        lutitecontent10p
-            The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
-        lutitecontent90p
-            The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
-        sandmedian
-            Median value of the sand fraction (µm).
-        sandmedian10p
-            The 10th percentile for the variation in sand median (µm).
-        sandmedian90p
-            The 10th percentile for the variation in sand median (µm).
-        siltcontent
-            Median value of the content of mineral particles with a grain size between 50 µm and 2 mm.
-        density
-            Median value for density (g cm^-3).
-        wcres
-            Residual water content (cm^3 cm^-3).
-        wcsat
-            Saturated water content (cm^3 cm^-3)
-        vgmalpha
-            Van Genuchten-Mualem shape parameter (cm^-1).
-        vgmnpar
-            Van Genuchten-Mualem shape parameter (-).
-        vgmlambda
-            Van Genuchten-Mualem shape parameter (-).
-        ksatfit
-            Fitted hydraulic conductivity at saturation (cm d^-1)
+            Columns
+            -------
+            layernumber
+                Horizon number, counting from top.
+            faohorizonnotation
+                Horizon type according to FAO classification (see https://www.fao.org/4/a0541e/a0541e.pdf, chapter 5)
+            ztop
+                Depth of top of the horizon (cm below surface).
+            zbottom
+                Depth of bottom of the horizon (cm below surface).
+            staringseriesblock
+                Name of staring series block.
+            organicmattercontent
+                Median organic matter content (mass-%).
+            organicmattercontent10p
+                The 10th percentile of the variation in organic matter content (mass-%).
+            organicmattercontent90p
+                The 90th percentile of the variation in organic matter content (mass-%).
+            acidity
+                Median acidity (pH).
+            acidity10p
+                The 10th percentile for the variation in acidity (pH).
+            acidity90p
+                The 90th percentile for the variation in acidity (pH).
+            cnratio
+                Ratio between carbon and nitrogen in the organic matter.
+            peattype
+                Type of peat.
+            calciccontent
+                Median calcite (CaCO3) content (mass-%).
+            fedith
+                Median Fe2O3 content (mass-%).
+            loamcontent
+                Median value of the content of mineral particles with a grain size smaller than 50 µm.
+            loamcontent10p
+                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
+            loamcontent90p
+                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
+            lutitecontent
+                Median value of the content of mineral particles with a grain size smaller than 2 µm.
+            lutitecontent10p
+                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
+            lutitecontent90p
+                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
+            sandmedian
+                Median value of the sand fraction (µm).
+            sandmedian10p
+                The 10th percentile for the variation in sand median (µm).
+            sandmedian90p
+                The 10th percentile for the variation in sand median (µm).
+            siltcontent
+                Median value of the content of mineral particles with a grain size between 50 µm and 2 mm.
+            density
+                Median value for density (g cm^-3).
+            wcres
+                Residual water content (cm^3 cm^-3).
+            wcsat
+                Saturated water content (cm^3 cm^-3)
+            vgmalpha
+                Van Genuchten-Mualem shape parameter (cm^-1).
+            vgmnpar
+                Van Genuchten-Mualem shape parameter (-).
+            vgmlambda
+                Van Genuchten-Mualem shape parameter (-).
+            ksatfit
+                Fitted hydraulic conductivity at saturation (cm d^-1)
         """
         # Get data horizons
         dataall = self._get_data_csv("SoilHorizons", filter_profile=True)
@@ -743,11 +738,11 @@ class SoilProfile:
         discretisation_depths = [1, 2, 5, 10, 20]
         discretisation_compheights = [10, 20, 30, 40, 100]
         will return a dictionary which represents a discretisation of the soil profile of:
-            0-10 cm: cells of 1 cm height.
-            10-30 cm: cells of 2 cm height.
-            30-60 cm: cells of 5 cm height.
-            60-100 cm: cells of 10 cm height.
-            100-200 cm: cells of 20 cm height.
+        0-10 cm: cells of 1 cm height.
+        10-30 cm: cells of 2 cm height.
+        30-60 cm: cells of 5 cm height.
+        60-100 cm: cells of 10 cm height.
+        100-200 cm: cells of 20 cm height.
         """
 
         # Get data

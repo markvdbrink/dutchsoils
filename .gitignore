@@ -5,6 +5,7 @@ __pycache__/
 
 # Distribution / packaging
 dist/
+build/
 
 # Unit test / coverage reports
 htmlcov/
