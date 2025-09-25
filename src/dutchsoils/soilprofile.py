@@ -329,7 +329,7 @@ class SoilProfile:
         crs: str = "EPSG:28992",
     ) -> "SoilProfile" | list["SoilProfile"]:
         """
-        Create SoilProfile(s) from geographic coordinates using the soilphysics.wur.nl API.
+        Create SoilProfile(s) from geographic coordinates using the API of https://soilphysics.wur.nl.
 
         You can provide either a single pair of coordinates (x, y), or two iterables of coordinates (x and y) of equal length to obtain multiple SoilProfiles.
 
@@ -567,10 +567,8 @@ class SoilProfile:
         Returns
         -------
         pandas.Dataframe
-            Data for each soil horizon. For further explanation of columns see https://docs.geostandaarden.nl/bro/vv-im-SGM-20220328/.
+            Data for each soil horizon. The columns are (for further explanation see https://docs.geostandaarden.nl/bro/vv-im-SGM-20220328/):
 
-            Columns
-            -------
             layernumber
                 Horizon number, counting from top.
             faohorizonnotation
@@ -852,15 +850,15 @@ class SoilProfile:
         # Add given information or data from the database
         result.update(
             {
-                "ORES": data["wcres"],
-                "OSAT": data["wcsat"],
-                "ALFA": data["vgmalpha"],
-                "NPAR": data["vgmnpar"],
-                "KSATFIT": data["ksatfit"],
-                "LEXP": data["vgmlambda"],
+                "ORES": data["wcres"].values,
+                "OSAT": data["wcsat"].values,
+                "ALFA": data["vgmalpha"].values,
+                "NPAR": data["vgmnpar"].values,
+                "KSATFIT": data["ksatfit"].values,
+                "LEXP": data["vgmlambda"].values,
                 "H_ENPR": h_enpr if h_enpr is not None else [0.0] * len(data["wcres"]),
-                "KSATEXM": ksatexm if ksatexm is not None else data["ksatfit"],
-                "BDENS": data["density"] * 1000,  # Convert from g/cm3 to kg/m3
+                "KSATEXM": ksatexm if ksatexm is not None else data["ksatfit"].values,
+                "BDENS": data["density"].values * 1000,  # Convert from g/cm3 to kg/m3
             }
         )
 
@@ -889,9 +887,9 @@ class SoilProfile:
         # Add other information from the database
         result.update(
             {
-                "PSILT": data["siltcontent"],
-                "PCLAY": data["lutitecontent"],
-                "ORGMAT": data["organicmattercontent"],
+                "PSILT": data["siltcontent"].values,
+                "PCLAY": data["lutitecontent"].values,
+                "ORGMAT": data["organicmattercontent"].values,
             }
         )
 

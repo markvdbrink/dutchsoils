@@ -1,4 +1,4 @@
-API documentation
+API Reference
 =================
 
 This section contains the Documentation of the Application Programming
