@@ -25,7 +25,8 @@
 *.csv           text
 
 # Documentation
-*.ipynb         text eol=lf
+*.rst           text
+*.ipynb         text
 *.md            text diff=markdown
 LICENSE         text
 *README*        text
