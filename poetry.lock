@@ -3308,4 +3308,4 @@ ipykernel = ["ipykernel"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "768eb99af6036e273a4ce8665299efa6ab4a4836d2d59061231a9fd2d4435447"
+content-hash = "422c82553d38ad39305088ead1a70890dd45db7396a25503579fce856e818c30"

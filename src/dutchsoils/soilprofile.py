@@ -1,10 +1,11 @@
 from __future__ import annotations
+
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from warnings import warn
-from collections.abc import Iterable
 
-from numpy import array, ones, diff, concatenate, searchsorted
+from numpy import array, concatenate, diff, ones, searchsorted
 from pandas import (
     DataFrame,
     read_csv,
@@ -722,25 +723,14 @@ class SoilProfile:
         Parameters
         ----------
         discretisation_depths : list of int
-            List of discretisation depths (cm).
+            List of discretisation depths (cm). For example "[30, 70]" will result in two layers with a depth of 30 and 70 cm, respectively. The result is a soil profile of 100 cm depth.
         discretisation_compheights : list of int
-            List of compartment heights (cm) for each depth.
+            List of compartment heights (cm) for each depth. For example, "[1, 2]" will result in two layers with cell sizes of 1 and 2 cm, respectively.
 
         Returns
         -------
         dict
             Discretisation information for pySWAP.
-
-        Example
-        -------
-        discretisation_depths = [1, 2, 5, 10, 20]
-        discretisation_compheights = [10, 20, 30, 40, 100]
-        will return a dictionary which represents a discretisation of the soil profile of:
-        0-10 cm: cells of 1 cm height.
-        10-30 cm: cells of 2 cm height.
-        30-60 cm: cells of 5 cm height.
-        60-100 cm: cells of 10 cm height.
-        100-200 cm: cells of 20 cm height.
         """
 
         # Get data

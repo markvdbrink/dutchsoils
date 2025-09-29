@@ -25,16 +25,23 @@ extensions = [
     "sphinx.ext.intersphinx",
     "numpydoc",
     "myst_nb",
-    # "myst_parser"
     # "sphinx.ext.viewcode",
-    # 'sphinx.ext.doctest',
 ]
 
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
-html_css_files = ["custom.css"]
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",  # Label for this link
+            "url": "https://github.com/markvdbrink/dutchsoils",  # required
+            "icon": "fab fa-github-square",
+            "type": "fontawesome",  # Default is fontawesome
+        }
+    ],
+}
 
 # -- Autodoc and autosummary settings ------------------------------
 

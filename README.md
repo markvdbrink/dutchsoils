@@ -23,7 +23,7 @@ pip install dutchsoils
 
 ## Get started
 
-Getting a soil profile with geographical coordinates, getting the data of its horizons and plotting the common parameters:
+Getting a soil profile with geographical coordinates and plotting its most common parameters:
 
 ```
 import dutchsoils as ds
@@ -32,7 +32,7 @@ sp.get_data_horizons()
 sp.plot()
 ```
 
-An example with other available options is given in `docs/examples`.
+An example with other available options is given in `docs/examples`. XXX
 
 ## Feedback
 
