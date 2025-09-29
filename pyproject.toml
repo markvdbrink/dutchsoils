@@ -47,4 +47,15 @@ dev = [
     "pytest ~=8.4",
     "pre-commit ~=4.2",
     "coverage ~=7.10",
+    "sphinx ~=8.2",
+    "pydata-sphinx-theme ~=0.16",
+    "numpydoc ~=1.9",
+    "myst-nb ~=1.3",
+    "myst-parser >=4.0",
 ]
+
+[tool.ruff]
+extend-include = ["*.ipynb"]
+lint.extend-select = ["I"]
+show-fixes = true
+fix = true

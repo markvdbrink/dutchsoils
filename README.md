@@ -7,7 +7,7 @@
 
 DutchSoils is a Python package to get soil data from the Dutch Soil Map, Staring series and BOFEK clustering.
 
-It contains code to get soil texture data from the [Dutch Soil Map](https://www.wur.nl/nl/show/bodemkaart-van-nederland.htm) and combine that with the [BOFEK soil clustering](https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm) and the hydraulic parameters from the [Staring series](https://research.wur.nl/en/publications/waterretentie-en-doorlatendheidskarakteristieken-van-boven-en-ond-5).
+It contains code to get soil physical, textural, chemical data from the [Dutch Soil Map](https://www.wur.nl/nl/show/bodemkaart-van-nederland.htm) and combine that with the [BOFEK soil clustering](https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm) and the hydraulic parameters from the [Staring series](https://research.wur.nl/en/publications/waterretentie-en-doorlatendheidskarakteristieken-van-boven-en-ond-5).
 
 > [!Note]
 > The data and soil profiles in this package are not actual measurements but are **derived** from field measurements. It is assumed that the soil profile and associated data are typical for the soil at a certain location.
@@ -25,7 +25,7 @@ pip install dutchsoils
 
 ## Get started
 
-Getting a soil profile with geographical coordinates, getting the data of its horizons and plotting the common parameters:
+Getting a soil profile with geographical coordinates and plotting its most common parameters:
 
 ```
 import dutchsoils as ds
@@ -34,7 +34,7 @@ sp.get_data_horizons()
 sp.plot()
 ```
 
-An example with other available options is given in `docs/examples`.
+An example with other available options is given in `docs/examples`. XXX
 
 ## Feedback
 
