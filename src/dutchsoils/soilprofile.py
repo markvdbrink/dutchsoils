@@ -338,6 +338,12 @@ class SoilProfile:
 
         You can provide either a single pair of coordinates (x, y), or two iterables of coordinates (x and y) of equal length to obtain multiple SoilProfiles.
 
+        .. warning::
+            This method uses the API of https://soilphysics.wur.nl.
+            This website uses the outdated soil map from 1999.
+            Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years.
+            If so, please do not use this method.
+
         Parameters
         ----------
         x : float or list of float
