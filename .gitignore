@@ -17,7 +17,12 @@ docs/source/generated/
 # Environments
 .venv
 
-# Ruff stuff:
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff stuff
 .ruff_cache/
 
 # VScode
