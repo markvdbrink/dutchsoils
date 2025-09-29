@@ -338,6 +338,12 @@ class SoilProfile:
 
         You can provide either a single pair of coordinates (x, y), or two iterables of coordinates (x and y) of equal length to obtain multiple SoilProfiles.
 
+        .. warning::
+            This method uses the API of https://soilphysics.wur.nl.
+            This website uses the outdated soil map from 1999.
+            Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years.
+            If so, please do not use this method.
+
         Parameters
         ----------
         x : float or list of float
@@ -350,7 +356,20 @@ class SoilProfile:
         Returns
         -------
         SoilProfile or list of SoilProfile
+
+        Notes
+        -----
+        This method uses the API of soilphysics.wur.nl.
         """
+        # Issue warning that API soilphysics.wur.nl uses old soil map
+        warn(
+            "This method uses the API of https://soilphysics.wur.nl. "
+            "This website uses the outdated soil map from 1999. "
+            "Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years. "
+            "If so, please do not use this method.",
+            stacklevel=2,
+        )
+
         # Check input
         cls._check_input_location(x, y, crs)
 
