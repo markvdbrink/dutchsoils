@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "dutchsoils"
-version = "0.2.1"
+version = "0.3.0"
 description = "Package to get soil profiles of the Netherlands."
 authors = [
     {name = "markvdbrink",email = "mark.vandenbrink@wur.nl"}
@@ -12,7 +12,7 @@ authors = [
 maintainers = [
     {name = "markvdbrink",email = "mark.vandenbrink@wur.nl"}
 ]
-license = {file = "LICENSE"}
+license = {text = "MIT License"}
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -39,7 +39,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/markvdbrink/dutchsoils"
 Issues = "https://github.com/markvdbrink/dutchsoils/issues"
-Source = "https://bodemdata.nl/"
+Source = "https://bodemdata.nl/basiskaarten"
 
 [project.optional-dependencies]
 ipykernel = ["ipykernel ~=6.29"]
