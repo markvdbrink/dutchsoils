@@ -25,13 +25,14 @@ There are two ways in which you can improve the documentation: online on GitHub 
 
 To edit documentation online on GitHub, use the following steps:
 1. Log in using your GitHub account.
-2. Browse to the file with the documentation you want to change **on the `dev` branch**. This can either be a `.rst` in the `doc/source` folder or the docstring in the source code located at `src/dutchsoils`.
+2. Browse to the file with the documentation you want to change. This can either be a `.rst` in the `doc/source` folder or the docstring in the source code located at `src/dutchsoils`.
 3. Click "Edit this file" and make your desired changes.
 4. Click on the "Commit changes" button. Write in the title a short description of what you did. In the "Extended description", explain why you propose the changes with as much detail as possible.
 5. Click on "Create a new branch for this commit and start a pull request" and give your branch a descriptive name, such as `docs/improvement`.
-6. We will review your changes and merge them in the `dev` branch if everything is okay. Your changes will be made public with the next release!
+6. Target the pull request on **on the development (`dev`) branch**.
+7. We will review your changes and merge them if everything is okay. Your changes will be made public with the next release!
 
-Alternatively, if you want to edit the documentation locally, please refer to [Contributing code](https://github.com/markvdbrink/dutchsoils/blob/main/CONTRIBUTING.md#contributing-code) for instructions.
+Alternatively, if you want to edit the documentation locally, please refer to [Contributing code](https://dutchsoils.readthedocs.io/en/latest/contribute.html#contributing-code) for instructions.
 
 ### Contributing code
 
@@ -55,5 +56,5 @@ Execute `pre-commit run` after staging your changed files for a Git commit. This
 When preparing a pull request, please follow these steps:
 1. [Submit an issue](https://github.com/markvdbrink/dutchsoils/issues) describing the feature or bug which you want to address.
 2. Branch the `main` branch using a descriptive name, such as `feat/xxx`, `docs/xxx` or `issue/xxx`.
-3. Commit your changes using commit messages starting with indicators such as `feat: `, `fix: `, `docs: ` or `chore: `. Use the body of the commit to explain **why** the changes were made.
+3. Commit your changes using [conventional commit messages](https://www.conventionalcommits.org/en/v1.0.0/) starting with indicators such as `feat: `, `fix: `, `docs: ` or `chore: `. Use the body of the commit to explain **why** the changes were made.
 4. Submit a pull request on the `dev` branch of the `markvdbrink/dutchsoils` repo.
