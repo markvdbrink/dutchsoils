@@ -15,7 +15,7 @@ It contains code to get soil physical, textural, chemical data from the [Dutch S
 > [!Note]
 > The method `from_location()` uses the API of [soilphysics.wur.nl](https://soilphysics.wur.nl) to get the soil profile at a location. This website uses the outdated soil map from 1999. Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years. If so, please do not use this method.
 
-## Installation
+## Get started
 
 The easiest way to install the package is through `pip`:
 
@@ -23,24 +23,23 @@ The easiest way to install the package is through `pip`:
 pip install dutchsoils
 ```
 
-## Get started
-
 Getting a soil profile with geographical coordinates and plotting its most common parameters:
 
 ```
 import dutchsoils as ds
 sp = ds.SoilProfile.from_location(x=171827, y=445436, crs="EPSG:28992")
-sp.get_data_horizons()
 sp.plot()
 ```
 
-An example with other available options is given in `docs/examples`. XXX
+Other examples are given in the [documentation](https://dutchsoils.readthedocs.io/en/latest/).
 
-## Feedback
+## Questions, issues & contributions
 
-Feedback is always welcome!
+Feel free to get in touch:
 
-Questions, issues, feature requests and bugs can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
+- Questions can be posted in the [Q&A discussion section](https://github.com/markvdbrink/dutchsoils/discussions/categories/q-a).
+- Bugs and feature requests can be reported in the [issue section](https://github.com/markvdbrink/dutchsoils/issues).
+- Contributions are welcome! Please have a look at the [contributing page](https://dutchsoils.readthedocs.io/en/latest/contribute.html).
 
 ## Many thanks to
 - The developers of [Wageningen Environmental Research](https://soilphysics.wur.nl) for publishing and maintaining the Dutch soil map and providing an API to get the soil profile at a certain location.
