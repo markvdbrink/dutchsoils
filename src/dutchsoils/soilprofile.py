@@ -4,15 +4,15 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from warnings import warn
+from xml.etree import ElementTree
 
 from numpy import array, concatenate, diff, ones, searchsorted
 from pandas import (
     DataFrame,
     read_csv,
 )
-from pyproj import Transformer
-from pyproj.database import query_crs_info
 from requests import get as requests_get
+from requests.exceptions import JSONDecodeError
 
 from .plot import soilprofile as plot_soilprofile
 
@@ -138,10 +138,15 @@ class SoilProfile:
         soilprofiles = self._get_data_csv(csvfile="SoilProfiles")
 
         # Find soilprofile index if soilprofile code is given
+        # TODO: there can be multiple indices for a single code, given different forms of land use (901, 902)
         if self.code is not None:
-            self.index = soilprofiles.loc[
-                soilprofiles["soilunit"] == self.code, "normalsoilprofile_id"
-            ].values[0]
+            self.index = (
+                soilprofiles.loc[
+                    soilprofiles["soilunit"] == self.code, "normalsoilprofile_id"
+                ]
+                .values[0]
+                .item()
+            )  # Convert datatype np.in64 to int
 
         # Find dominant soilprofile_index if bofek_cluster is given
         if self.bofekcluster is not None:
@@ -149,14 +154,16 @@ class SoilProfile:
                 (bofekclusters["cluster"] == self.bofekcluster)
                 & (bofekclusters["dominant"] == 1)
             ]
+            self.index = row["normalsoilprofile_id"].iloc[0].item()
         # Find bofek_cluster if soilprofile_index is given
         else:
             # Find bofek_cluster
             row = bofekclusters[bofekclusters["normalsoilprofile_id"] == self.index]
 
-        # Store index, area, and bofek dominance
-        self.index = row["normalsoilprofile_id"].iloc[0]
-        self.bofekcluster = row["cluster"].iloc[0]
+            # Store bofek cluster
+            self.bofekcluster = row["cluster"].iloc[0].item()
+
+        # Store bofek cluster dominance
         self.bofekcluster_dominant = row["dominant"].iloc[0].astype(bool)
 
         # Store code and name of soilprofile
@@ -164,7 +171,7 @@ class SoilProfile:
             soilprofiles["normalsoilprofile_id"] == self.index, "soilunit"
         ].values[0]
         self.name = soilprofiles.loc[
-            soilprofiles["normalsoilprofile_id"] == self.index, "name"
+            soilprofiles["normalsoilprofile_id"] == self.index, "othersoilname"
         ].values[0]
 
         # Store name bofek cluster
@@ -247,7 +254,7 @@ class SoilProfile:
                 try:
                     result.append(cls(**{input_type: ii}))
                 except ValueError:
-                    # If cluster is invalid, give a warning and store a None
+                    # If input is invalid, give a warning and store a None
                     warn(
                         message=f"Given {input_type} '{ii}' is invalid, 'None' returned.",
                         stacklevel=3,
@@ -330,91 +337,56 @@ class SoilProfile:
         crs: str = "EPSG:28992",
     ) -> "SoilProfile" | list["SoilProfile"]:
         """
-        Create SoilProfile(s) from geographic coordinates using the API of https://soilphysics.wur.nl.
+        Create SoilProfile(s) from geographic coordinates using the WMS of PDOK (https://www.pdok.nl/ogc-webservices/-/article/bro-bodemkaart-sgm-).
 
         You can provide either a single pair of coordinates (x, y), or two iterables of coordinates (x and y) of equal length to obtain multiple SoilProfiles.
-
-        .. warning::
-            This method uses the API of https://soilphysics.wur.nl.
-            This website uses the outdated soil map from 1999.
-            Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years.
-            If so, please do not use this method.
 
         Parameters
         ----------
         x : float or list of float
-            X coordinate(s) (longitude or easting). If a list or array is given, it must have the same length as 'y'.
+            X coordinate(s) (longitude or easting). If a list or array is given, it must have the same length as `y`.
         y : float or list of float
-            Y coordinate(s) (latitude or northing). If a list or array is given, it must have the same length as 'x'.
+            Y coordinate(s) (latitude or northing). If a list or array is given, it must have the same length as `x`.
         crs : str, optional
-            Coordinate reference system (default: "EPSG:28992" (Amersfoort / RD New)).
+            Coordinate reference system, choose from: `["EPSG:28992", "EPSG:25831", "EPSG:25832", "EPSG:3034", "EPSG:3035",
+            "EPSG:3857", "EPSG:4258", "EPSG:4326", "CRS:84"]` (default: "EPSG:28992" (Amersfoort / RD New)).
 
         Returns
         -------
         SoilProfile or list of SoilProfile
 
-        Notes
-        -----
-        This method uses the API of soilphysics.wur.nl.
         """
-        # Issue warning that API soilphysics.wur.nl uses old soil map
-        warn(
-            "This method uses the API of https://soilphysics.wur.nl. "
-            "This website uses the outdated soil map from 1999. "
-            "Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years. "
-            "If so, please do not use this method.",
-            stacklevel=2,
-        )
 
-        # Check input
-        cls._check_input_location(x, y, crs)
+        # Check if x and y have the same length and right data type
+        cls._check_input_location(x, y)
 
-        # In case x and y are iterables
-        if cls._is_iterable(x) and cls._is_iterable(y):
-            result = []
-            for xx, yy in zip(x, y):
-                # Transform coordinates if necessary
-                xxtf, yytf = cls._transform_coordinates(xx, yy, crs)
+        # Convert to list if scalar
+        is_scalar = not (cls._is_iterable(x) and cls._is_iterable(y))
+        xl = [x] if is_scalar else x
+        yl = [y] if is_scalar else y
 
-                # Request index using coordinates
-                index = cls._request_index(xxtf, yytf)
+        # Request soil profile codes from PDOK WMS
+        result = []
+        for xx, yy in zip(xl, yl):
+            # Request code using coordinates
+            mapid = cls._request_mapid(xx, yy, crs)
 
-                # Initialise SoilProfile if index is not None
-                if index is not None:
-                    sp = cls.from_index(index)
-                    result.append(sp)
-                else:
-                    # Give warning and return None
-                    warn(
-                        f"No soil information available for this location: x = {xx}, y = {yy}.",
-                        stacklevel=2,
-                    )
-                    result.append(None)
-
-            return result
-
-        # In case x and y are not iterables
-        else:
-            # Transform coordinates if necessary
-            xxtf, yytf = cls._transform_coordinates(x, y, crs)
-
-            # Request index using coordinates
-            index = cls._request_index(xxtf, yytf)
-
-            # Initialise SoilProfile if index exists
-            if index is not None:
-                return cls.from_index(index)
-            # If not, give warning and return None
+            # Initialise SoilProfile if code is not None
+            if mapid is not None:
+                sp = cls._from_mapid(mapid)
+                result.append(sp)
             else:
                 # Give warning and return None
                 warn(
-                    f"No soil information available for this location: x = {x}, y = {y}.",
+                    f"No soil information available for this location: x = {xx}, y = {yy}.",
                     stacklevel=2,
                 )
-                return
+                result.append(None)
+
+        return result[0] if is_scalar else result
 
     @classmethod
-    def _check_input_location(cls, x, y, crs):
+    def _check_input_location(cls, x, y):
         """
         Validates location input for profile lookup.
 
@@ -424,20 +396,12 @@ class SoilProfile:
             X coordinate(s).
         y : float or iterable
             Y coordinate(s).
-        crs : str
-            Coordinate reference system.
 
         Raises
         ------
         ValueError
             If input is invalid.
         """
-
-        # Check CRS validity
-        crs_info_list = query_crs_info(auth_name=None, pj_types=None)
-        crs_list = ["EPSG:" + info[1] for info in crs_info_list]
-        if crs not in crs_list:
-            raise ValueError(f"CRS '{crs}' is not valid.")
 
         # Check if x and y are both iterables or both scalars
         if cls._is_iterable(x):
@@ -468,69 +432,105 @@ class SoilProfile:
         return
 
     @classmethod
-    def _transform_coordinates(cls, xx, yy, crs):
+    def _request_mapid(cls, xx, yy, crs):
         """
-        Transforms coordinates to EPSG:4326 if necessary.
+        Requests mapid of feature at given location from PDOK WMS 1.3.0 API for given coordinates.
 
         Parameters
         ----------
         xx : float
-            X coordinate.
+            X-coordinate.
         yy : float
-            Y coordinate.
+            Y-coordinate.
         crs : str
-            Input CRS.
+            Coordinate reference system in format "EPSG:xxx".
 
         Returns
         -------
-        tuple
-            Transformed (xx, yy) in EPSG:4326.
+        str or None
+            Map id of feature of the Dutch Soil Map, or None if not available.
         """
 
-        # Transform coordinates to EPSG 4326 if necessary
-        if crs != "EPSG:4326":
-            transformer = Transformer.from_crs(
-                crs_from=crs,
-                crs_to="EPSG:4326",
-            )
-            xx, yy = transformer.transform(xx, yy)
+        # Send request for soil data to PDOK WMS
+        # The bounding box extents from the requested location 1 meter north and east
+        # The image consists of 2x2 pixels
+        # The pixel value of the lower left pixel is returned
+        r = requests_get(
+            url="https://service.pdok.nl/bzk/bro-bodemkaart/wms/v1_0",
+            params={
+                "request": "getFeatureInfo",
+                "service": "WMS",
+                "version": "1.3.0",
+                "info_format": "json",
+                "layers": "soilarea",
+                "query_layers": "soilarea",
+                "crs": crs,
+                "bbox": f"{xx},{yy},{xx + 1e-5},{yy + 1e-5}",
+                "width": 2,
+                "height": 2,
+                "i": 0,
+                "j": 2,
+            },
+        )
+        # Raise error for a HTTP error
+        # This is not inside a try-except loop because the error should be displayed to the user
+        r.raise_for_status()
 
-        return xx, yy
+        # Get soil profile mapid
+        # Valid request
+        try:
+            data = r.json()["features"]
+
+            # Check if a soil profile is available for this location
+            if len(data) == 0:
+                # Return None if not available
+                return
+            else:
+                # Return mapid if available
+                return data[0]["properties"]["maparea_id"]
+
+        # Invalid request
+        except JSONDecodeError:
+            # Parse XML file using namespace
+            root = ElementTree.fromstring(r.text)
+            ns = {"ogc": "http://www.opengis.net/ogc"}
+            exception = root.find("ogc:ServiceException", ns)
+
+            raise ValueError(exception.text)
 
     @classmethod
-    def _request_index(cls, lat, long):
+    def _from_mapid(cls, mapid):
         """
-        Requests soil profile index from soilphysics.wur.nl API for given coordinates.
+        Create a SoilProfile instance from a given map area ID.
+        This class method retrieves the corresponding soil profile index for the provided map area ID (`mapid`)
+        by referencing a CSV file that maps area IDs to soil profile indices. It then constructs and returns
+        a SoilProfile object using the retrieved index.
 
         Parameters
         ----------
-        lat : float
-            Latitude.
-        long : float
-            Longitude.
+        mapid : str
+            The full map area ID from which the soil profile should be created.
 
         Returns
         -------
-        int or None
-            Soil profile index, or None if not available.
+        SoilProfile
+            An instance of the SoilProfile class corresponding to the provided map area ID.
         """
+        # Load dataframe relating mapid to soilprofile index
+        df = cls._get_data_csv(self=None, csvfile="SoilProfiles_MapAreaID")
 
-        # Send request for soil data to soilphysics.wur.nl
-        r = requests_get(
-            url="https://www.soilphysics.wur.nl/soil.php",
-            params={"latitude": lat, "longitude": long},
+        # Strip mapid from redudant information
+        mapid_short = int(mapid[-5:])
+
+        # Get soilprofile index from mapid_short
+        index = (
+            df.loc[df["maparea_id"] == mapid_short, "normalsoilprofile_id"]
+            .values[0]
+            .item()
         )
 
-        # Extract data in json format
-        data = r.json()
-
-        # Check if a soil profile is available for this location
-        if data == "No soil information available for this location.":
-            # Return None if not available
-            return
-        else:
-            # Return index
-            return data["id"]
+        # Make SoilProfile object
+        return cls.from_index(index=index)
 
     def get_area(self, which: str = "profile") -> float:
         """

@@ -5,7 +5,7 @@
 # Source:
 # Download "Scripts clustering en bronbestanden" at https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm. This file can is a modified version of "StaringReeksPARS_2018.csv" at BOFEK2020_v1.0_scripts\1_CalcAllPars\Data.
 #
-# Date:
+# Date downloaded:
 # 2025-08-05
 # --------------------------------------------------------------------------------------------------------
 staringseriesblock,wcres,wcsat,vgmalpha,vgmnpar,vgmlambda,ksatfit

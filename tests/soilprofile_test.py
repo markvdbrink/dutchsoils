@@ -1,10 +1,10 @@
-from pathlib import Path
 import warnings
+from pathlib import Path
 
 import pytest
-from pandas.testing import assert_frame_equal
-from pandas import read_csv, DataFrame
 from numpy import array
+from pandas import DataFrame, read_csv
+from pandas.testing import assert_frame_equal
 
 from dutchsoils import SoilProfile
 
@@ -81,12 +81,34 @@ def test_from_location():
     )
     assert sp.index == 90115320
 
-    # Test with location without soil profile
+    # Test with location without soil profile: x=0,y=0
     with warnings.catch_warnings(record=True) as w:
         sp = SoilProfile.from_location(x=0, y=0)
-    assert len(w) == 2
+    assert len(w) == 1
     assert "No soil information available for this location: x = 0, y = 0." in str(
-        w[1].message
+        w[0].message
+    )
+    assert issubclass(w[0].category, UserWarning)
+    assert sp is None
+
+    # Test with location without soil profile: buildup area
+    with warnings.catch_warnings(record=True) as w:
+        sp = SoilProfile.from_location(x=185848.5, y=320060.5)
+    assert len(w) == 1
+    assert (
+        "No soil information available for this location: x = 185848.5, y = 320060.5."
+        in str(w[0].message)
+    )
+    assert issubclass(w[0].category, UserWarning)
+    assert sp is None
+
+    # Test with location without soil profile: digged area
+    with warnings.catch_warnings(record=True) as w:
+        sp = SoilProfile.from_location(x=183758.4, y=319317.1)
+    assert len(w) == 1
+    assert (
+        "No soil information available for this location: x = 183758.4, y = 319317.1."
+        in str(w[0].message)
     )
     assert issubclass(w[0].category, UserWarning)
     assert sp is None
@@ -108,9 +130,9 @@ def test_from_location():
             x=x_test + [0],
             y=y_test + [0],
         )
-    assert len(w) == 2
+    assert len(w) == 1
     assert "No soil information available for this location: x = 0, y = 0." in str(
-        w[1].message
+        w[0].message
     )
     assert issubclass(w[0].category, UserWarning)
     assert sp[-1] is None
@@ -201,7 +223,7 @@ def test_from_location():
     # Test with non-existing CRS
     with pytest.raises(ValueError) as exc_info:
         SoilProfile.from_location(x=x_test[0], y=y_test[0], crs="test")
-    assert "CRS 'test' is not valid." in str(exc_info.value)
+    assert "Unsupported CRS namespace" in str(exc_info.value)
 
 
 def test_initialisation_soilprofile():

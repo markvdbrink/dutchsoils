@@ -3,56 +3,56 @@
 # The different soil profiles of the Dutch Soil Map.
 #
 # Source:
-# Download "Bodemkaart 1:50.000" at https://bodemdata.nl/basiskaarten. This file is a reduced version of the table "normalsoilprofiles" within "BRO-SGM-DownloadBodemkaart-V2024-01_1.gpkg"
-#
-# Date:
-# 2025-08-05
+# Download the Dutch Soil Map at https://bodemdata.nl/files/download/Levering-BRO-SGM-V2025-01_1.zip.
+# This file is table "normalsoilprofiles" within "BRO-SGM-DownloadBodemkaart-V2025-01_1.gpkg"
+# Columns "region", "validfrom", "beginlifespanversion", "inspire_id", "lowervalue", "uppervalue" were removed to reduce file size.
+# Date downloaded: 2026-01-16
 # --------------------------------------------------------------------------------------------------------
-normalsoilprofile_id,soilunit,name
+normalsoilprofile_id,soilunit,othersoilname
 1010,hVb,Koopveengronden op bosveen (of eutroof broekveen)
 1020,ohVb,Koopveengronden op bosveen (of eutroof broekveen)
 1030,hVs,Koopveengronden op veenmosveen
 1040,hVsc,Koopveengronden op veenmosveen
-1050,hVc,"Koopveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1060,hVk,"Koopveengronden op (meestal niet-gerijpte) zavel of klei, beginnend ondieper dan 1.2 m"
-1070,hVz,"Koopveengronden op zand, beginnend ondieper dan 1.2 m"
-1071,hVzc,"Koopveengronden op zand, beginnend ondieper dan 1.2 m"
-1072,hVzx,"Koopveengronden op zand, beginnend ondieper dan 1.2 m"
-1080,aVc,"Madeveengronden op zeggeveen, rietzeggeveen of broekveen"
-1090,faVc,"Madeveengronden op zeggeveen, rietzeggeveen of broekveen"
-1100,aVz,"Madeveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1110,faVz,"Madeveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1111,faVzt,"Madeveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1120,aVp,"Madeveengronden op zand met humuspodzol, beginnend ondieper dan 1.2 m"
+1050,hVc,Koopveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1060,hVk,Koopveengronden op (meestal niet-gerijpte) zavel of klei beginnend ondieper dan 1.2 m
+1070,hVz,Koopveengronden op zand beginnend ondieper dan 1.2 m
+1071,hVzc,Koopveengronden op zand beginnend ondieper dan 1.2 m
+1072,hVzx,Koopveengronden op zand beginnend ondieper dan 1.2 m
+1080,aVc,Madeveengronden op zeggeveen rietzeggeveen of broekveen
+1090,faVc,Madeveengronden op zeggeveen rietzeggeveen of broekveen
+1100,aVz,Madeveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1110,faVz,Madeveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1111,faVzt,Madeveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1120,aVp,Madeveengronden op zand met humuspodzol beginnend ondieper dan 1.2 m
 1130,pVb,Weideveengronden op bosveen (of eutroof broekveen)
 1140,opVb,Weideveengronden op bosveen (of eutroof broekveen)
 1150,pVs,Weideveengronden op veenmosveen
-1160,opVc,"Weideveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1170,pVc,"Weideveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1180,pVz,"Weideveengronden op zand, beginnend ondieper dan 1.2 m"
+1160,opVc,Weideveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1170,pVc,Weideveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1180,pVz,Weideveengronden op zand beginnend ondieper dan 1.2 m
 1190,kVb,Waardveengronden op bosveen (of eutroof broekveen)
 1200,kVs,Waardveengronden op veenmosveen
 1210,kVsc,Waardveengronden op veenmosveen
-1220,kVc,"Waardveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1225,kVc,"Waardveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1230,kVz,"Waardveengronden op zand, beginnend ondieper dan 1.2 m"
-1235,kVz,"Waardveengronden op zand, beginnend ondieper dan 1.2 m"
-1240,kVk,"Waardveengronden op (meestal niet-gerijpte) zavel of klei, beginnend ondieper dan 1.2 m"
-1250,zVz,"Meerveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1255,zVz,"Meerveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1260,zVc,"Meerveengronden op zeggeveen, rietzeggeveen of broekveen"
-1265,zVc,"Meerveengronden op zeggeveen, rietzeggeveen of broekveen"
-1270,zVp,"Meerveengronden op zand met humuspodzol, beginnend ondieper dan 1.2 m"
+1220,kVc,Waardveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1225,kVc,Waardveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1230,kVz,Waardveengronden op zand beginnend ondieper dan 1.2 m
+1235,kVz,Waardveengronden op zand beginnend ondieper dan 1.2 m
+1240,kVk,Waardveengronden op (meestal niet-gerijpte) zavel of klei beginnend ondieper dan 1.2 m
+1250,zVz,Meerveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1255,zVz,Meerveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1260,zVc,Meerveengronden op zeggeveen rietzeggeveen of broekveen
+1265,zVc,Meerveengronden op zeggeveen rietzeggeveen of broekveen
+1270,zVp,Meerveengronden op zand met humuspodzol beginnend ondieper dan 1.2 m
 1275,AVk,Veenafbraakgebied
 1281,Vs,Vlierveengronden op veenmosveen
 1282,Vs,Vlierveengronden op veenmosveen
-1290,Vc,"Vlierveengronden op zeggeveen, rietzeggeveen of (mesotroof) broekveen"
-1300,dVk,"Vlierveengronden op (meestal niet-gerijpte) zavel of klei, beginnend ondieper dan 1.2 m"
-1310,Vz,"Vlierveengronden op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1320,Vp,"Vlierveengronden op zand met humuspodzol, beginnend ondieper dan 1.2 m"
-1330,iVc,"Veengronden met een veenkoloniaal dek op zeggeveen, rietzeggeveen of moerasbosveen"
-1340,iVz,"Veengronden met een veenkoloniaal dek op zand zonder humuspodzol, beginnend ondieper dan 1.2 m"
-1350,iVp,"Veengronden met een veenkoloniaal dek op zand met humuspodzol, beginnend ondieper dan 1.2 m"
+1290,Vc,Vlierveengronden op zeggeveen rietzeggeveen of (mesotroof) broekveen
+1300,dVk,Vlierveengronden op (meestal niet-gerijpte) zavel of klei beginnend ondieper dan 1.2 m
+1310,Vz,Vlierveengronden op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1320,Vp,Vlierveengronden op zand met humuspodzol beginnend ondieper dan 1.2 m
+1330,iVc,Veengronden met een veenkoloniaal dek op zeggeveen rietzeggeveen of moerasbosveen
+1340,iVz,Veengronden met een veenkoloniaal dek op zand zonder humuspodzol beginnend ondieper dan 1.2 m
+1350,iVp,Veengronden met een veenkoloniaal dek op zand met humuspodzol beginnend ondieper dan 1.2 m
 2010,kWp,Moerige podzolgronden met een zavel- of een kleidek en een moerige tussenlaag
 2015,kWp,Moerige podzolgronden met een zavel- of een kleidek en een moerige tussenlaag
 2020,vWp,Moerige podzolgronden met een moerige bovengrond
@@ -122,7 +122,7 @@ normalsoilprofile_id,soilunit,name
 8101,zEZ23t,Hoge zwarte enkeerdgronden; lemig fijn zand
 8110,zEZ30g,Hoge zwarte enkeerdgronden; grof zand
 8120,EZ50A,Kalkhoudende enkeerdgronden; matig fijn zand
-9010,EK19,"Tuineerdgronden; lichte zavel, profielverloop 5, of 5 en 2, of 2"
+9010,EK19,Tuineerdgronden; lichte zavel profielverloop 5 of 5 en 2 of 2
 9020,EL5,Tuineerdgronden; zandige leem
 10010,pZg21,Beekeerdgronden; leemarm en zwak lemig fijn zand
 10012,pZg21g,Beekeerdgronden; leemarm en zwak lemig fijn zand
@@ -178,119 +178,119 @@ normalsoilprofile_id,soilunit,name
 11032,kZn50A,Kalkhoudende vlakvaaggronden; matig fijn zand
 11051,Zn50Ar,Kalkhoudende vlakvaaggronden; matig fijn zand
 11060,Zn30A,Kalkhoudende vlakvaaggronden; grof zand
-11061,Zn30Ab,"Kalkhoudende vlakvaaggronden; grof zand, gedeeltelijk ontkalkt"
+11061,Zn30Ab,Kalkhoudende vlakvaaggronden; grof zand gedeeltelijk ontkalkt
 11070,Zd20A,Kalkhoudende duinvaaggronden; fijn zand
-11071,Zd20Ab,"Kalkhoudende duinvaaggronden; fijn zand, gedeeltelijk ontkalkt"
-12010,Sn13A,"Kalkhoudende vlakvaaggronden; zwak en sterk lemig, kleiig, uiterst fijn zand"
-12011,Sn13Av,"Kalkhoudende vlakvaaggronden; zwak en sterk lemig, kleiig, uiterst fijn zand"
-12020,kSn13A,"Kalkhoudende vlakvaaggronden; zwak en sterk lemig, kleiig, uiterst fijn zand"
+11071,Zd20Ab,Kalkhoudende duinvaaggronden; fijn zand gedeeltelijk ontkalkt
+12010,Sn13A,Kalkhoudende vlakvaaggronden; zwak en sterk lemig kleiig uiterst fijn zand
+12011,Sn13Av,Kalkhoudende vlakvaaggronden; zwak en sterk lemig kleiig uiterst fijn zand
+12020,kSn13A,Kalkhoudende vlakvaaggronden; zwak en sterk lemig kleiig uiterst fijn zand
 13010,MOo02,Slikvaaggronden; zand beginnend ondieper dan 0.8 m
 13020,MOo05,Slikvaaggronden; geen zand beginnend ondieper dan 0.8 m
 13030,MOb72,Gorsvaaggronden; zware zavel en klei; zand beginnend ondieper dan 0.8 m
 13040,MOb75,Gorsvaaggronden; zware zavel en klei; geen zand beginnend ondieper dan 0.8 m
-15010,pMv51,"Liedeerdgronden; zavel, profielverloop 1"
-15020,pMv81,"Liedeerdgronden; klei, profielverloop 1"
+15010,pMv51,Liedeerdgronden; zavel profielverloop 1
+15020,pMv81,Liedeerdgronden; klei profielverloop 1
 15030,pMo50,Tochteerdgronden; zavel
 15040,pMo80,Tochteerdgronden; klei
 15041,pMo80l,Tochteerdgronden; klei
-15051,pMn52A,"Kalkrijke leek-/woudeerdgronden; zavel, profielverloop 2"
-15070,pMn86C,"Kalkarme leek-/woudeerdgronden; klei, profielverloop 3, of 3 en 4 of 4"
-15071,pMn86Cw,"Kalkarme leek-/woudeerdgronden; klei, profielverloop 3, of 3 en 4 of 4"
-15080,pMn55C,"Kalkarme leek-/woudeerdgronden; zavel, profielverloop 5"
-15090,pMn85C,"Kalkarme leek-/woudeerdgronden; klei, profielverloop 5"
-15100,Mv51A,"Kalkrijke drechtvaaggronden; zavel, profielverloop 1"
-15101,eMv61C,"Kalkarme drechtvaaggronden; zavel en lichte klei, profielverloop 1"
-15110,Mv81A,"Kalkrijke drechtvaaggronden; klei, profielverloop 1"
-15111,eMv41C,"Kalkarme drechtvaaggronden; zware klei, profielverloop 1"
-15120,Mv61C,"Kalkarme drechtvaaggronden; zavel en lichte klei, profielverloop 1"
-15130,Mv41C,"Kalkarme drechtvaaggronden; zware klei, profielverloop 1"
-15131,Mv41Cl,"Kalkarme drechtvaaggronden; zware klei, profielverloop 1"
-15132,Mv41Cp,"Kalkarme drechtvaaggronden; zware klei, profielverloop 1"
+15051,pMn52A,Kalkrijke leek-/woudeerdgronden; zavel profielverloop 2
+15070,pMn86C,Kalkarme leek-/woudeerdgronden; klei profielverloop 3 of 3 en 4 of 4
+15071,pMn86Cw,Kalkarme leek-/woudeerdgronden; klei profielverloop 3 of 3 en 4 of 4
+15080,pMn55C,Kalkarme leek-/woudeerdgronden; zavel profielverloop 5
+15090,pMn85C,Kalkarme leek-/woudeerdgronden; klei profielverloop 5
+15100,Mv51A,Kalkrijke drechtvaaggronden; zavel profielverloop 1
+15101,eMv61C,Kalkarme drechtvaaggronden; zavel en lichte klei profielverloop 1
+15110,Mv81A,Kalkrijke drechtvaaggronden; klei profielverloop 1
+15111,eMv41C,Kalkarme drechtvaaggronden; zware klei profielverloop 1
+15120,Mv61C,Kalkarme drechtvaaggronden; zavel en lichte klei profielverloop 1
+15130,Mv41C,Kalkarme drechtvaaggronden; zware klei profielverloop 1
+15131,Mv41Cl,Kalkarme drechtvaaggronden; zware klei profielverloop 1
+15132,Mv41Cp,Kalkarme drechtvaaggronden; zware klei profielverloop 1
 15140,Mo20A,Kalkrijke nesvaaggronden; zware zavel
 15160,Mo80A,Kalkrijke nesvaaggronden; klei
 15170,Mo80C,Kalkarme nesvaaggronden; klei
 15171,Mo80Cv,Kalkarme nesvaaggronden; klei
-15180,Mn12A,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 2"
-15190,Mn12Ap,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 2"
-15200,Mn22A,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 2"
-15210,Mn22Ap,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 2"
-15220,Mn82A,"Kalkrijke poldervaaggronden; klei, profielverloop 2"
-15230,Mn82Ap,"Kalkrijke poldervaaggronden; klei, profielverloop 2"
-15241,Mn15Ap,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-15250,Mn15Av,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-15251,Mn15Aw,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-15260,bMn15A,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-15280,Mn25Ap,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15290,Mn25Av,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15291,Mn25Aw,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15300,bMn25A,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15310,eMn25A,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15311,eMn25Av,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-15330,Mn35Ap,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-15340,Mn35Av,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-15350,eMn35A,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-15351,eMn35Av,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-15361,Mn45Ap,"Kalkrijke poldervaaggronden; zware klei, profielverloop 5"
-15370,Mn52Cp,"Kalkarme poldervaaggronden; zavel, profielverloop 2"
-15380,Mn82Cp,"Kalkarme poldervaaggronden; klei, profielverloop 2"
-15381,Mn82Cwp,"Kalkarme poldervaaggronden; klei, profielverloop 2"
-15390,Mn56C,"Kalkarme poldervaaggronden; zavel, profielverloop 3, of 3 en 4, of 4"
-15400,Mn86C,"Kalkarme poldervaaggronden; klei, profielverloop 3, of 3 en 4, of 4"
-15401,Mn86Cl,"Kalkarme poldervaaggronden; klei, profielverloop 3, of 3 en 4, of 4"
-15402,Mn86Cv,"Kalkarme poldervaaggronden; klei, profielverloop 3, of 3 en 4, of 4"
-15403,Mn86Cwp,"Kalkarme poldervaaggronden; klei, profielverloop 3, of 3 en 4, of 4"
-15411,Mn15Cw,"Kalkarme poldervaaggronden; lichte zavel, profielverloop 5"
-15420,bMn15C,"Kalkarme poldervaaggronden; lichte zavel, profielverloop 5"
-15431,Mn25Cw,"Kalkarme poldervaaggronden; zware zavel, profielverloop 5"
-15440,Mn85C,"Kalkarme poldervaaggronden; klei, profielverloop 5"
-15441,Mn85Cv,"Kalkarme poldervaaggronden; klei, profielverloop 5"
-15442,Mn85Cwp,"Kalkarme poldervaaggronden; klei, profielverloop 5"
-15450,gMn53C,"Knippige poldervaaggronden; zavel, profielverloop 3"
-15451,gMn52C,"Knippige poldervaaggronden; zavel, profielverloop 2"
-15452,gMn58Cv,"Knippige poldervaaggronden; zavel, profielverloop 4, of 4 en 3"
-15460,gMn83C,"Knippige poldervaaggronden; klei, profielverloop 3"
-15461,gMn83Cp,"Knippige poldervaaggronden; klei, profielverloop 3"
-15462,gMn83Cw,"Knippige poldervaaggronden; klei, profielverloop 3"
-15470,gMn88C,"Knippige poldervaaggronden; klei, profielverloop 4, of 4 en 3"
-15480,gMn88Cv,"Knippige poldervaaggronden; klei, profielverloop 4, of 4 en 3"
-15481,gMn88Clv,"Knippige poldervaaggronden; klei, profielverloop 4, of 4 en 3"
-15510,gMn85C,"Knippige poldervaaggronden; klei, profielverloop 5"
-15520,kMn63C,"Knippoldervaaggronden; zavel en lichte klei, profielverloop 3"
-15521,kMn63Cp,"Knippoldervaaggronden; zavel en lichte klei, profielverloop 3"
-15530,kMn68C,"Knippoldervaaggronden; zavel en lichte klei, profielverloop 4, of 4 en 3"
-15540,kMn43C,"Knippoldervaaggronden; zware klei, profielverloop 3"
-15541,kMn43Cp,"Knippoldervaaggronden; zware klei, profielverloop 3"
-15550,kMn48C,"Knippoldervaaggronden; zware klei, profielverloop 4, of 4 en 3"
-15560,kMn48Cv,"Knippoldervaaggronden; zware klei, profielverloop 4, of 4 en 3"
-16010,pRv81,"Liedeerdgronden; klei, profielverloop 1"
-16020,pRn59,"Leek-/woudeerdgronden; zavel, profielverloop 5, of 5 en 2, of 2"
-16021,pRn59,"Leek-/woudeerdgronden; zavel, profielverloop 5, of 5 en 2, of 2"
-16030,pRn86,"Leek-/woudeerdgronden; klei, profielverloop 3, of 3 en 4, of 4"
+15180,Mn12A,Kalkrijke poldervaaggronden; lichte zavel profielverloop 2
+15190,Mn12Ap,Kalkrijke poldervaaggronden; lichte zavel profielverloop 2
+15200,Mn22A,Kalkrijke poldervaaggronden; zware zavel profielverloop 2
+15210,Mn22Ap,Kalkrijke poldervaaggronden; zware zavel profielverloop 2
+15220,Mn82A,Kalkrijke poldervaaggronden; klei profielverloop 2
+15230,Mn82Ap,Kalkrijke poldervaaggronden; klei profielverloop 2
+15241,Mn15Ap,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+15250,Mn15Av,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+15251,Mn15Aw,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+15260,bMn15A,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+15280,Mn25Ap,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15290,Mn25Av,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15291,Mn25Aw,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15300,bMn25A,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15310,eMn25A,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15311,eMn25Av,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+15330,Mn35Ap,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+15340,Mn35Av,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+15350,eMn35A,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+15351,eMn35Av,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+15361,Mn45Ap,Kalkrijke poldervaaggronden; zware klei profielverloop 5
+15370,Mn52Cp,Kalkarme poldervaaggronden; zavel profielverloop 2
+15380,Mn82Cp,Kalkarme poldervaaggronden; klei profielverloop 2
+15381,Mn82Cwp,Kalkarme poldervaaggronden; klei profielverloop 2
+15390,Mn56C,Kalkarme poldervaaggronden; zavel profielverloop 3 of 3 en 4 of 4
+15400,Mn86C,Kalkarme poldervaaggronden; klei profielverloop 3 of 3 en 4 of 4
+15401,Mn86Cl,Kalkarme poldervaaggronden; klei profielverloop 3 of 3 en 4 of 4
+15402,Mn86Cv,Kalkarme poldervaaggronden; klei profielverloop 3 of 3 en 4 of 4
+15403,Mn86Cwp,Kalkarme poldervaaggronden; klei profielverloop 3 of 3 en 4 of 4
+15411,Mn15Cw,Kalkarme poldervaaggronden; lichte zavel profielverloop 5
+15420,bMn15C,Kalkarme poldervaaggronden; lichte zavel profielverloop 5
+15431,Mn25Cw,Kalkarme poldervaaggronden; zware zavel profielverloop 5
+15440,Mn85C,Kalkarme poldervaaggronden; klei profielverloop 5
+15441,Mn85Cv,Kalkarme poldervaaggronden; klei profielverloop 5
+15442,Mn85Cwp,Kalkarme poldervaaggronden; klei profielverloop 5
+15450,gMn53C,Knippige poldervaaggronden; zavel profielverloop 3
+15451,gMn52C,Knippige poldervaaggronden; zavel profielverloop 2
+15452,gMn58Cv,Knippige poldervaaggronden; zavel profielverloop 4 of 4 en 3
+15460,gMn83C,Knippige poldervaaggronden; klei profielverloop 3
+15461,gMn83Cp,Knippige poldervaaggronden; klei profielverloop 3
+15462,gMn83Cw,Knippige poldervaaggronden; klei profielverloop 3
+15470,gMn88C,Knippige poldervaaggronden; klei profielverloop 4 of 4 en 3
+15480,gMn88Cv,Knippige poldervaaggronden; klei profielverloop 4 of 4 en 3
+15481,gMn88Clv,Knippige poldervaaggronden; klei profielverloop 4 of 4 en 3
+15510,gMn85C,Knippige poldervaaggronden; klei profielverloop 5
+15520,kMn63C,Knippoldervaaggronden; zavel en lichte klei profielverloop 3
+15521,kMn63Cp,Knippoldervaaggronden; zavel en lichte klei profielverloop 3
+15530,kMn68C,Knippoldervaaggronden; zavel en lichte klei profielverloop 4 of 4 en 3
+15540,kMn43C,Knippoldervaaggronden; zware klei profielverloop 3
+15541,kMn43Cp,Knippoldervaaggronden; zware klei profielverloop 3
+15550,kMn48C,Knippoldervaaggronden; zware klei profielverloop 4 of 4 en 3
+15560,kMn48Cv,Knippoldervaaggronden; zware klei profielverloop 4 of 4 en 3
+16010,pRv81,Liedeerdgronden; klei profielverloop 1
+16020,pRn59,Leek-/woudeerdgronden; zavel profielverloop 5 of 5 en 2 of 2
+16021,pRn59,Leek-/woudeerdgronden; zavel profielverloop 5 of 5 en 2 of 2
+16030,pRn86,Leek-/woudeerdgronden; klei profielverloop 3 of 3 en 4 of 4
 16040,Rv01C,Kalkloze drechtvaaggronden; profielverloop 1
-16061,Rn66Av,"Kalkhoudende poldervaaggronden; zavel en lichte klei, profielverloop 3, of 3 en 4, of 4"
-16070,Rn46A,"Kalkhoudende poldervaaggronden; zware klei, profielverloop 3, of 3 en 4 , of 4"
-16110,Rn62C,"Kalkloze poldervaaggronden; zavel en lichte klei, profielverloop 2"
-16111,Rn62Cg,"Kalkloze poldervaaggronden; zavel en lichte klei, profielverloop 2"
-16120,fRn62C,"Kalkloze poldervaaggronden; zavel en lichte klei, profielverloop 2"
-16121,fRn95C,"Kalkloze poldervaaggronden; zware zavel en lichte klei, profielverloop 5"
-16130,Rn67C,"Kalkloze poldervaaggronden; zavel en lichte klei, profielverloop 3, of 3 en 4"
-16140,Rn62Cp,"Kalkloze poldervaaggronden; zavel en lichte klei, profielverloop 2"
-16150,Rn94C,"Kalkloze poldervaaggronden; zware zavel en lichte klei, profielverloop 4"
-16160,Rn47C,"Kalkloze poldervaaggronden; zware klei, profielverloop 3, of 3 en 4"
-16170,Rn47Cp,"Kalkloze poldervaaggronden; zware klei, profielverloop 3, of 3 en 4"
-16171,Rn47Cwp,"Kalkloze poldervaaggronden; zware klei, profielverloop 3, of 3 en 4"
-16180,bRn46C,"Kalkloze poldervaaggronden (bruine komgrond); zware klei, profielverloop 3, of 3 en 4, of 4"
-16190,Rn44C,"Kalkloze poldervaaggronden; zware klei, profielverloop 4"
-16200,Rn44Cv,"Kalkloze poldervaaggronden; zware klei, profielverloop 4"
-16201,Rn44Cw,"Kalkloze poldervaaggronden; zware klei, profielverloop 4"
+16061,Rn66Av,Kalkhoudende poldervaaggronden; zavel en lichte klei profielverloop 3 of 3 en 4 of 4
+16070,Rn46A,Kalkhoudende poldervaaggronden; zware klei profielverloop 3 of 3 en 4  of 4
+16110,Rn62C,Kalkloze poldervaaggronden; zavel en lichte klei profielverloop 2
+16111,Rn62Cg,Kalkloze poldervaaggronden; zavel en lichte klei profielverloop 2
+16120,fRn62C,Kalkloze poldervaaggronden; zavel en lichte klei profielverloop 2
+16121,fRn95C,Kalkloze poldervaaggronden; zware zavel en lichte klei profielverloop 5
+16130,Rn67C,Kalkloze poldervaaggronden; zavel en lichte klei profielverloop 3 of 3 en 4
+16140,Rn62Cp,Kalkloze poldervaaggronden; zavel en lichte klei profielverloop 2
+16150,Rn94C,Kalkloze poldervaaggronden; zware zavel en lichte klei profielverloop 4
+16160,Rn47C,Kalkloze poldervaaggronden; zware klei profielverloop 3 of 3 en 4
+16170,Rn47Cp,Kalkloze poldervaaggronden; zware klei profielverloop 3 of 3 en 4
+16171,Rn47Cwp,Kalkloze poldervaaggronden; zware klei profielverloop 3 of 3 en 4
+16180,bRn46C,Kalkloze poldervaaggronden (bruine komgrond); zware klei profielverloop 3 of 3 en 4 of 4
+16190,Rn44C,Kalkloze poldervaaggronden; zware klei profielverloop 4
+16200,Rn44Cv,Kalkloze poldervaaggronden; zware klei profielverloop 4
+16201,Rn44Cw,Kalkloze poldervaaggronden; zware klei profielverloop 4
 17010,KRn1,Poldervaaggronden; lichte zavel
 17020,KRn1g,Poldervaaggronden; lichte zavel
 17030,KRn2,Poldervaaggronden; zware zavel
 17040,KRn2g,Poldervaaggronden; zware zavel
 17050,KRn8,Poldervaaggronden; klei
 17051,KRn8g,Poldervaaggronden; klei
-17060,KRd1,"Ooivaaggronden, lichte zavel"
-17061,KRd1g,"Ooivaaggronden, lichte zavel"
+17060,KRd1,Ooivaaggronden lichte zavel
+17061,KRd1g,Ooivaaggronden lichte zavel
 17070,KRd7,Ooivaaggronden; zware zavel en klei
 17071,KRd7g,Ooivaaggronden; zware zavel en klei
 18010,pLn5,Leek-/woudeerdgronden; zandige leem; colluvium in dal
@@ -301,7 +301,7 @@ normalsoilprofile_id,soilunit,name
 18040,Ld6,Ooivaaggronden met roest beginnend dieper dan 0.8 m; siltige leem in situ
 18041,Ld6g,Ooivaaggronden met roest beginnend dieper dan 0.8 m; siltige leem in situ
 18050,Ldh6,Ooivaaggronden met roest beginnend dieper dan 0.8 m; siltige leem; colluvium in hellingvoet of uitspoelingswaaier
-22010,KX,"Zeer ondiepe keileem, potklei, enz"
+22010,KX,Zeer ondiepe keileem potklei enz
 22011,KT,Overige kleigronden
 22020,KK,Kleefaarde
 9013010,Y21,Holtpodzolgronden; leemarm en zwak lemig fijn zand
@@ -331,22 +331,22 @@ normalsoilprofile_id,soilunit,name
 90110280,Zb23,Vorstvaaggronden; lemig fijn zand
 90111040,Zn40A,Kalkhoudende vlakvaaggronden; zeer fijn zand
 90111050,Zn50A,Kalkhoudende vlakvaaggronden; matig fijn zand
-90115050,pMn55A,"Kalkrijke leek-/woudeerdgronden; zavel, profielverloop 5"
-90115060,pMn85A,"Kalkrijke leek-/woudeerdgronden; klei, profielverloop 5"
-90115240,Mn15A,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-90115270,Mn25A,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-90115320,Mn35A,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-90115360,Mn45A,"Kalkrijke poldervaaggronden; zware klei, profielverloop 5"
-90115410,Mn15C,"Kalkarme poldervaaggronden; lichte zavel, profielverloop 5"
-90115430,Mn25C,"Kalkarme poldervaaggronden; zware zavel, profielverloop 5"
-90115490,gMn15C,"Knippige poldervaaggronden; lichte zavel, profielverloop 5"
-90115500,gMn25C,"Knippige poldervaaggronden; zware zavel, profielverloop 5"
-90116050,Rn52A,"Kalkhoudende poldervaaggronden; zavel, profielverloop 2"
-90116060,Rn66A,"Kalkhoudende poldervaaggronden; zavel en lichte klei, profielverloop 3, of 3 en 4, of 4"
-90116080,Rn15A,"Kalkhoudende poldervaaggronden; lichte zavel, profielverloop 5"
-90116090,Rn95A,"Kalkhoudende poldervaaggronden; zware zavel en lichte klei, profielverloop 5"
-90116210,Rn15C,"Kalkloze poldervaaggronden; lichte zavel, profielverloop 5"
-90116220,Rn95C,"Kalkloze poldervaaggronden; zware zavel en lichte klei, profielverloop 5"
+90115050,pMn55A,Kalkrijke leek-/woudeerdgronden; zavel profielverloop 5
+90115060,pMn85A,Kalkrijke leek-/woudeerdgronden; klei profielverloop 5
+90115240,Mn15A,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+90115270,Mn25A,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+90115320,Mn35A,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+90115360,Mn45A,Kalkrijke poldervaaggronden; zware klei profielverloop 5
+90115410,Mn15C,Kalkarme poldervaaggronden; lichte zavel profielverloop 5
+90115430,Mn25C,Kalkarme poldervaaggronden; zware zavel profielverloop 5
+90115490,gMn15C,Knippige poldervaaggronden; lichte zavel profielverloop 5
+90115500,gMn25C,Knippige poldervaaggronden; zware zavel profielverloop 5
+90116050,Rn52A,Kalkhoudende poldervaaggronden; zavel profielverloop 2
+90116060,Rn66A,Kalkhoudende poldervaaggronden; zavel en lichte klei profielverloop 3 of 3 en 4 of 4
+90116080,Rn15A,Kalkhoudende poldervaaggronden; lichte zavel profielverloop 5
+90116090,Rn95A,Kalkhoudende poldervaaggronden; zware zavel en lichte klei profielverloop 5
+90116210,Rn15C,Kalkloze poldervaaggronden; lichte zavel profielverloop 5
+90116220,Rn95C,Kalkloze poldervaaggronden; zware zavel en lichte klei profielverloop 5
 90116230,Rd10A,Kalkhoudende ooivaaggronden; lichte zavel
 90116240,Rd90A,Kalkhoudende ooivaaggronden; zware zavel en lichte klei
 90116250,Rd10C,Kalkloze ooivaaggronden; lichte zavel
@@ -356,22 +356,22 @@ normalsoilprofile_id,soilunit,name
 90210280,Zb23,Vorstvaaggronden; lemig fijn zand
 90211040,Zn40A,Kalkhoudende vlakvaaggronden; zeer fijn zand
 90211050,Zn50A,Kalkhoudende vlakvaaggronden; matig fijn zand
-90215050,pMn55A,"Kalkrijke leek-/woudeerdgronden; zavel, profielverloop 5"
-90215060,pMn85A,"Kalkrijke leek-/woudeerdgronden; klei, profielverloop 5"
-90215240,Mn15A,"Kalkrijke poldervaaggronden; lichte zavel, profielverloop 5"
-90215270,Mn25A,"Kalkrijke poldervaaggronden; zware zavel, profielverloop 5"
-90215320,Mn35A,"Kalkrijke poldervaaggronden; lichte klei, profielverloop 5"
-90215360,Mn45A,"Kalkrijke poldervaaggronden; zware klei, profielverloop 5"
-90215410,Mn15C,"Kalkarme poldervaaggronden; lichte zavel, profielverloop 5"
-90215430,Mn25C,"Kalkarme poldervaaggronden; zware zavel, profielverloop 5"
-90215490,gMn15C,"Knippige poldervaaggronden; lichte zavel, profielverloop 5"
-90215500,gMn25C,"Knippige poldervaaggronden; zware zavel, profielverloop 5"
-90216050,Rn52A,"Kalkhoudende poldervaaggronden; zavel, profielverloop 2"
-90216060,Rn66A,"Kalkhoudende poldervaaggronden; zavel en lichte klei, profielverloop 3, of 3 en 4, of 4"
-90216080,Rn15A,"Kalkhoudende poldervaaggronden; lichte zavel, profielverloop 5"
-90216090,Rn95A,"Kalkhoudende poldervaaggronden; zware zavel en lichte klei, profielverloop 5"
-90216210,Rn15C,"Kalkloze poldervaaggronden; lichte zavel, profielverloop 5"
-90216220,Rn95C,"Kalkloze poldervaaggronden; zware zavel en lichte klei, profielverloop 5"
+90215050,pMn55A,Kalkrijke leek-/woudeerdgronden; zavel profielverloop 5
+90215060,pMn85A,Kalkrijke leek-/woudeerdgronden; klei profielverloop 5
+90215240,Mn15A,Kalkrijke poldervaaggronden; lichte zavel profielverloop 5
+90215270,Mn25A,Kalkrijke poldervaaggronden; zware zavel profielverloop 5
+90215320,Mn35A,Kalkrijke poldervaaggronden; lichte klei profielverloop 5
+90215360,Mn45A,Kalkrijke poldervaaggronden; zware klei profielverloop 5
+90215410,Mn15C,Kalkarme poldervaaggronden; lichte zavel profielverloop 5
+90215430,Mn25C,Kalkarme poldervaaggronden; zware zavel profielverloop 5
+90215490,gMn15C,Knippige poldervaaggronden; lichte zavel profielverloop 5
+90215500,gMn25C,Knippige poldervaaggronden; zware zavel profielverloop 5
+90216050,Rn52A,Kalkhoudende poldervaaggronden; zavel profielverloop 2
+90216060,Rn66A,Kalkhoudende poldervaaggronden; zavel en lichte klei profielverloop 3 of 3 en 4 of 4
+90216080,Rn15A,Kalkhoudende poldervaaggronden; lichte zavel profielverloop 5
+90216090,Rn95A,Kalkhoudende poldervaaggronden; zware zavel en lichte klei profielverloop 5
+90216210,Rn15C,Kalkloze poldervaaggronden; lichte zavel profielverloop 5
+90216220,Rn95C,Kalkloze poldervaaggronden; zware zavel en lichte klei profielverloop 5
 90216230,Rd10A,Kalkhoudende ooivaaggronden; lichte zavel
 90216240,Rd90A,Kalkhoudende ooivaaggronden; zware zavel en lichte klei
 90216250,Rd10C,Kalkloze ooivaaggronden; lichte zavel
