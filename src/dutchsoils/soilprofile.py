@@ -602,17 +602,17 @@ class SoilProfile:
             fedith
                 Median Fe2O3 content (mass-%).
             loamcontent
-                Median value of the content of mineral particles with a grain size smaller than 50 µm.
+                Median value of the content of mineral particles with a grain size smaller than 50 µm (mass-%).
             loamcontent10p
-                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
+                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm (mass-%).
             loamcontent90p
-                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm.
+                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 50 µm (mass-%).
             lutitecontent
-                Median value of the content of mineral particles with a grain size smaller than 2 µm.
+                Median value of the content of mineral particles with a grain size smaller than 2 µm (mass-%).
             lutitecontent10p
-                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
+                The 10th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm (mass-%).
             lutitecontent90p
-                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm.
+                The 90th percentile for the variation in the content of mineral particles with a grain size smaller than 2 µm (mass-%).
             sandmedian
                 Median value of the sand fraction (µm).
             sandmedian10p
@@ -620,7 +620,7 @@ class SoilProfile:
             sandmedian90p
                 The 10th percentile for the variation in sand median (µm).
             siltcontent
-                Median value of the content of mineral particles with a grain size between 50 µm and 2 mm.
+                Median value of the content of mineral particles with a grain size between 50 µm and 2 mm (mass-%).
             density
                 Median value for density (g cm^-3).
             wcres
