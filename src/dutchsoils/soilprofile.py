@@ -51,9 +51,6 @@ class SoilProfile:
     bofekcluster: int | None = None
     bofekcluster_name: str = field(init=False)
     bofekcluster_dominant: bool = field(init=False)
-    # Deprecated attributes
-    soilprofile_index: int | None = None
-    bofek_cluster: int | None = None
 
     def __post_init__(self):
         """
@@ -66,28 +63,9 @@ class SoilProfile:
         """
         Validates initialization parameters and raises ValueError if invalid.
 
-        - Issues DeprecationWarnings for deprecated attributes.
         - Ensures only one of `index`, `code`, or `bofekcluster` is provided.
         - Checks if provided values exist in the data.
         """
-
-        # Deprecation warning
-        if self.bofek_cluster:
-            warn(
-                "The use of `bofek_cluster` is deprecated and will be removed in a later version. Please use `bofekcluster` or the designated `from_bofekcluster` function.",
-                FutureWarning,
-                stacklevel=4,
-            )
-            self.bofekcluster = self.bofek_cluster
-
-        # Deprecation warning
-        if self.soilprofile_index:
-            warn(
-                "The use of `soilprofile_index` is deprecated and will be removed in a later version. Please use `index` or the designated `from_index` function.",
-                FutureWarning,
-                stacklevel=4,
-            )
-            self.index = self.soilprofile_index
 
         # Get data bofek clusters and soil profiles
         bofekclusters = self._get_data_csv("BofekClusters")
@@ -945,65 +923,3 @@ class SoilProfile:
         """
 
         plot_soilprofile(self, merge_layers=merge_layers)
-
-    def _get_allprofiles(self) -> DataFrame:
-        """
-        [Deprecated] Returns a DataFrame with all soil profiles.
-
-        .. deprecated:: 0.1.5
-            This function is deprecated and will be removed in a later version.
-            Please use _get_data_csv instead.
-
-        Returns
-        -------
-        pandas.DataFrame
-        """
-
-        # Deprecation warning
-        warn(
-            "This function is deprecated and will be removed in a later version. Please use _get_data_csv instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        path = Path(__file__).parent / "data/soilprofiles_BodemkaartBofek.csv"
-        all_profiles = read_csv(path, skiprows=12)
-
-        return all_profiles
-
-    def get_data(self) -> DataFrame:
-        """
-        [Deprecated] Returns a DataFrame with data per soil layer.
-
-        .. deprecated:: 0.1.5
-            This function is deprecated and will be removed in a later version.
-            Please use get_data_horizons or the attributes of the soilprofile instead.
-
-        Returns
-        -------
-        pandas.DataFrame
-        """
-
-        # Deprecation warning
-        warn(
-            "This function is deprecated and will be removed in a later version. Please use get_data_horizons or the attributes of the soilprofile instead.",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-        # Get data all profiles
-        allprofiles = self._get_allprofiles()
-
-        # Make mask depending on given input
-        if self.index is not None:
-            mask = allprofiles["soil_id"] == self.index
-        elif self.bofekcluster is not None:
-            # If bofek cluster is given, return only the dominant profile
-            mask = (allprofiles["bofek_cluster"] == self.bofekcluster) & (
-                allprofiles["bofek_dominant"]
-            )
-
-        # Get data
-        data = allprofiles.loc[mask].reset_index(drop=True)
-
-        return data
