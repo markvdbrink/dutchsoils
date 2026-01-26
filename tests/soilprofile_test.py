@@ -223,7 +223,7 @@ def test_from_location():
     # Test with non-existing CRS
     with pytest.raises(ValueError) as exc_info:
         SoilProfile.from_location(x=x_test[0], y=y_test[0], crs="test")
-    assert "Unsupported CRS namespace" in str(exc_info.value)
+    assert "Unsupported CRS: test. Please use format 'EPSG:XXX'." in str(exc_info.value)
 
 
 def test_initialisation_soilprofile():

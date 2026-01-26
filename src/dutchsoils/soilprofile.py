@@ -496,7 +496,11 @@ class SoilProfile:
             ns = {"ogc": "http://www.opengis.net/ogc"}
             exception = root.find("ogc:ServiceException", ns)
 
-            raise ValueError(exception.text)
+            if "Unsupported CRS namespace" in exception.text:
+                m = f"Unsupported CRS: {crs}. Please use format 'EPSG:XXX'."
+                raise ValueError(m)
+            else:
+                raise ValueError(exception.text)
 
     @classmethod
     def _from_mapid(cls, mapid):
