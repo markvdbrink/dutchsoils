@@ -3,9 +3,9 @@
 # For each soilprofile in the Dutch Soil Map the area and BOFEK2020 cluster number.
 #
 # Source:
-# Download "Bodemfysische eenhedenkaart + tabel (N.B.: vereist dubbel uitpakken)" at https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm. This file can is a reduced version of "Clusterhoofden.xlsx" at BOFEK2020_GIS\BOFEK2020_GIS\GIS\BOFEK2020_bestanden\tabellen.
+# Download "Scripts clustering en bronbestanden" at https://www.wur.nl/nl/show/Bodemfysische-Eenhedenkaart-BOFEK2020.htm. This file can is a reduced version of "all_results_formatted_95.csv" at BOFEK2020_v1.0_scripts\3_Clustering\Output.
 #
-# Date:
+# Date downloaded:
 # 2025-08-05
 # --------------------------------------------------------------------------------------------------------
 normalsoilprofile_id,area,cluster,dominant

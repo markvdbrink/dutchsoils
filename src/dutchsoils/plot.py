@@ -1,10 +1,7 @@
-import warnings
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pedon as pe
-
 
 # Set default colors for each soil type
 COLORS_SOILS = {
@@ -66,7 +63,6 @@ COLORS_SOILGROUPS = {
 
 def soilprofile(
     soilprofile,
-    merge_layers=False,
 ) -> plt.Figure:
     """
     Plot a comprehensive visualization of a soil profile, including profile layers, hydraulic properties, texture fractions, and organic matter content.
@@ -80,10 +76,6 @@ def soilprofile(
     ----------
     soilprofile : SoilProfile
         An object representing the soil profile, expected to provide a `get_data()` method returning a DataFrame with required soil properties.
-    merge_layers : bool, optional
-        [Deprecated] If True, visually merges consecutive layers with identical Staring class names in the profile plot (default: False).
-        This parameter is deprecated because it is wrong to merge layers on the Staringclass alone because other properties are different.
-        At the moment, the parameter does nothing and will be removed in version 1.0.0.
 
     Returns
     -------
@@ -95,13 +87,6 @@ def soilprofile(
     >>> fig = soilprofile(my_soilprofile, merge_layers=True)
     >>> fig.show()
     """
-
-    if merge_layers:
-        warnings.warn(
-            "The use of merge_layers is deprecated and will be removed in version 1.0.0.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
 
     # Get data
     data = soilprofile.get_data_horizons(which="all")
