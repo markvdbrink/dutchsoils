@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 project = "DutchSoils"
 copyright = "2025, Mark van den Brink"
 author = "Mark van den Brink"
-release = "0.2.1"
+release = "0.3.2"
 
 # -- General configuration ---------------------------------------------------
 
