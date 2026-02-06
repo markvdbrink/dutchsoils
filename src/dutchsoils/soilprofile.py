@@ -1038,15 +1038,9 @@ class SoilProfile:
 
         return [1.0] * len(data.index)
 
-    def plot(self, merge_layers: bool = False) -> None:
+    def plot(self) -> None:
         """
         Plots the soil profile using the DutchSoils visualization.
-
-        Parameters
-        ----------
-        merge_layers : bool, optional
-            If True, adjacent layers with identical properties are merged before plotting.
-            If False (default), all layers are plotted as-is.
 
         Returns
         -------
@@ -1057,4 +1051,4 @@ class SoilProfile:
         The actual plotting is delegated to the `plot_soilprofile` function.
         """
 
-        plot_soilprofile(self, merge_layers=merge_layers)
+        plot_soilprofile(self)
