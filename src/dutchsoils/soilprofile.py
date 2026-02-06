@@ -20,29 +20,32 @@ from .plot import soilprofile as plot_soilprofile
 @dataclass
 class SoilProfile:
     """
-    Represents a single Dutch soil profile.
+    Represents a single Dutch soil profile, providing access to soil properties, horizons, and cluster information
+    based on various identifiers (index, code, or BOFEK2020 cluster). This class supports profile lookup by index,
+    code, cluster, or geographic location, and provides methods for retrieving soil horizon data, area statistics,
+    and input dictionaries for pySWAP modeling. Data is loaded from CSV files located in the package's data directory.
 
-    Parameters
+    Attributes
     ----------
-    index : int, optional
-        Soil profile index. Provide either this, `code`, or `bofekcluster`.
-    code : int, optional
-        Soil profile code. Provide either this, `index`, or `bofekcluster`.
-    bofekcluster : int, optional
-        BOFEK2020 cluster number. The dominant soil profile within this cluster will be used.
-    soilprofile_index : int, optional [Deprecated]
-        .. deprecated:: 0.1.5
-            This attribute is deprecated and will be removed in a later version.
-            Please use `index` instead.
-    bofek_cluster : int, optional [Deprecated]
-        .. deprecated:: 0.1.5
-            This attribute is deprecated and will be removed in a later version.
-            Please use `bofekcluster` instead.
+    index : int or None
+        Soil profile index.
+    code : int or None
+        Soil profile code.
+    name : str
+        Name of the soil profile.
+    bofekcluster : int or None
+        BOFEK2020 cluster number.
+    bofekcluster_name : str
+        Name of the BOFEK cluster.
+    bofekcluster_dominant : bool or None
+        Whether the profile is dominant in its cluster.
 
-    Notes
-    -----
-    Only one of `index`, `code`, or `bofekcluster` should be provided.
-    Deprecated attributes are for backward compatibility and will be removed in a future version.
+    Examples
+    --------
+    >>> sp = SoilProfile(index=101)
+    >>> sp.get_data_horizons()
+    >>> sp.get_area(which="profile")
+    >>> sp.plot()
     """
 
     index: int | None = None
@@ -50,116 +53,169 @@ class SoilProfile:
     name: str = field(init=False)
     bofekcluster: int | None = None
     bofekcluster_name: str = field(init=False)
-    bofekcluster_dominant: bool = field(init=False)
+    bofekcluster_dominant: bool | None = None
 
     def __post_init__(self):
         """
         Validates input and sets attributes based on provided parameters.
         """
-        self._check_input()
-        self._set_attributes()
-
-    def _check_input(self):
-        """
-        Validates initialization parameters and raises ValueError if invalid.
-
-        - Ensures only one of `index`, `code`, or `bofekcluster` is provided.
-        - Checks if provided values exist in the data.
-        """
-
-        # Get data bofek clusters and soil profiles
-        bofekclusters = self._get_data_csv("BofekClusters")
-        soilprofiles = self._get_data_csv("SoilProfiles")
-
-        # Check input parameters
-        # Check if input is given
-        nr_inputs = (
-            (self.index is not None)
-            + (self.bofekcluster is not None)
-            + (self.code is not None)
+        # Check nr of inputs
+        nr_inputs = sum(
+            x is not None for x in (self.index, self.bofekcluster, self.code)
         )
-        if nr_inputs == 0:
-            m = "Provide a soilprofile index or code or a bofek cluster number."
-        # Check if only one input is given
-        elif nr_inputs > 1:
-            m = "Provide only one input: soilprofile index, code or a bofek cluster number, not multiple."
-        # Check if given soilproile index is valid
-        elif (
-            self.index is not None
-            and self.index not in bofekclusters["normalsoilprofile_id"].values
-        ):
-            m = f"Given soilprofile index '{self.index}' does not exist."
-        # Check if given soilprofile code is valid
-        elif self.code is not None and self.code not in soilprofiles["soilunit"].values:
-            m = f"Given soilprofile code '{self.code}' does not exist."
-        # Check if given bofek cluster number is valid
-        elif (
-            self.bofekcluster is not None
-            and self.bofekcluster not in bofekclusters["cluster"].values
-        ):
-            m = f"Given bofek cluster number '{self.bofekcluster}' does not exist."
-        else:
-            return
+        if nr_inputs != 1:
+            raise ValueError(
+                "Provide exactly one input: soilprofile index, code, or bofek cluster number."
+            )
 
-        # Raise ValueError if one of the above conditions is not met
-        raise ValueError(m)
-
-    def _set_attributes(self):
-        """
-        Sets derived attributes (name, cluster info) based on input parameters.
-
-        - Finds and assigns soil profile index, code, name, cluster, and dominance.
-        - Raises ValueError if lookup fails.
-        """
         # Get data
         bofekclusters = self._get_data_csv(csvfile="BofekClusters")
         soilprofiles = self._get_data_csv(csvfile="SoilProfiles")
 
-        # Find soilprofile index if soilprofile code is given
-        # TODO: there can be multiple indices for a single code, given different forms of land use (901, 902)
-        if self.code is not None:
-            self.index = (
-                soilprofiles.loc[
-                    soilprofiles["soilunit"] == self.code, "normalsoilprofile_id"
-                ]
-                .values[0]
-                .item()
-            )  # Convert datatype np.in64 to int
-
-        # Find dominant soilprofile_index if bofek_cluster is given
-        if self.bofekcluster is not None:
-            row = bofekclusters[
-                (bofekclusters["cluster"] == self.bofekcluster)
-                & (bofekclusters["dominant"] == 1)
-            ]
-            self.index = row["normalsoilprofile_id"].iloc[0].item()
-        # Find bofek_cluster if soilprofile_index is given
+        # If index is given as input
+        if self.index is not None:
+            self._init_from_index(
+                soilprofiles=soilprofiles, bofekclusters=bofekclusters
+            )
+        # If soil unit code is given as input
+        elif self.code is not None:
+            self._init_from_code(bofekclusters=bofekclusters)
+        # If bofekcluster is given as input (else conditions since nr of inputs is checked)
         else:
-            # Find bofek_cluster
-            row = bofekclusters[bofekclusters["normalsoilprofile_id"] == self.index]
+            self._init_from_bofekcluster(
+                soilprofiles=soilprofiles, bofekclusters=bofekclusters
+            )
 
-            # Store bofek cluster
-            self.bofekcluster = row["cluster"].iloc[0].item()
+        self._set_names(soilprofiles=soilprofiles)
 
-        # Store bofek cluster dominance
-        self.bofekcluster_dominant = row["dominant"].iloc[0].astype(bool)
+    def _init_from_index(self, soilprofiles, bofekclusters):
+        """Set attributes SoilProfile based on provided soil profile index.
 
-        # Store code and name of soilprofile
+        Parameters
+        ----------
+        soilprofiles: pandas.DataFrame
+            DataFrame from data/SoilProfiles.csv
+        bofekclusters: pandas.DataFrame
+            DataFrame from data/BofekClusters.csv
+        """
+        # Check input
+        self._validate_input("index", self.index)
+
+        # Set soil code & bofek
+        self._set_bofekcluster(bofekclusters=bofekclusters)
+        self._set_code(soilprofiles=soilprofiles)
+
+    def _init_from_code(self, bofekclusters):
+        """Set attributes SoilProfile based on provided soil profile code.
+
+        Parameters
+        ----------
+        bofekclusters: pandas.DataFrame
+            DataFrame from data/BofekClusters.csv
+        """
+
+        # Check input
+        self._validate_input("code", self.code)
+
+        # Check nr indices
+        indices = self._get_indices(code=self.code)
+
+        # If only 1 index: find attributes
+        if len(indices) == 1:
+            # Set soil index & bofek
+            self.index = indices[0]
+            self._set_bofekcluster(bofekclusters=bofekclusters)
+
+        # If multiple indices: raise error
+        else:
+            msg = (
+                f"Given soil unit code {self.code} corresponds to multiple soils with indices "
+                + f"{', '.join([str(ind) for ind in indices])}.\n"
+                + "Specify the index to get one of them or use the method from_code() to get all."
+            )
+            raise ValueError(msg)
+
+    def _init_from_bofekcluster(self, soilprofiles, bofekclusters):
+        """Set attributes SoilProfile based on provided BOFEK cluster.
+
+        Parameters
+        ----------
+        soilprofiles: pandas.DataFrame
+            DataFrame from data/SoilProfiles.csv
+        bofekclusters: pandas.DataFrame
+            DataFrame from data/BofekClusters.csv
+        """
+
+        # Check input
+        self._validate_input("bofekcluster", self.bofekcluster)
+
+        # Check if cluster dominance is given
+        if self.bofekcluster_dominant is None:
+            msg = "Please specify the attribute bofekcluster_dominant."
+            raise ValueError(msg)
+        # If bofekcluster dominance True: find attributes
+        elif self.bofekcluster_dominant:
+            # Set soil index & code
+            mask = (bofekclusters["cluster"].values == self.bofekcluster) & (
+                bofekclusters["dominant"].values == 1
+            )
+            self.index = bofekclusters.loc[mask, "normalsoilprofile_id"].item()
+            self._set_code(soilprofiles=soilprofiles)
+        # If not: raise error
+        else:
+            msg = "To get all soilprofiles corresponding to this BOFEK cluster, use the method from_bofekcluster()."
+            raise ValueError(msg)
+
+    def _set_code(self, soilprofiles):
+        """Sets attribute code based on provided soil profile index.
+
+        Parameters
+        ----------
+        soilprofiles: pandas.DataFrame
+            DataFrame from data/SoilProfiles.csv
+        """
+
+        # Set soil unit code
         self.code = soilprofiles.loc[
             soilprofiles["normalsoilprofile_id"] == self.index, "soilunit"
         ].values[0]
+
+    def _set_bofekcluster(self, bofekclusters):
+        """Set attributes bofekcluster, bofekcluster_dominant based on provided soil profile index.
+
+        Parameters
+        ----------
+        bofekclusters: pandas.DataFrame
+            DataFrame from data/BofekClusters.csv
+        """
+
+        # Set bofek cluster & dominance
+        row = bofekclusters[bofekclusters["normalsoilprofile_id"] == self.index]
+        self.bofekcluster = row["cluster"].iloc[0].item()
+        self.bofekcluster_dominant = row["dominant"].iloc[0].astype(bool)
+
+    def _set_names(self, soilprofiles):
+        """Set attributes name and bofekcluster_name based on provided soil profile index.
+
+        Parameters
+        ----------
+        soilprofiles: pandas.DataFrame
+            DataFrame from data/SoilProfiles.csv
+        """
+
+        # Set name soil
         self.name = soilprofiles.loc[
             soilprofiles["normalsoilprofile_id"] == self.index, "othersoilname"
         ].values[0]
 
-        # Store name bofek cluster
+        # Set name bofek cluster
         bofeknames = self._get_data_csv(csvfile="BofekClustersNames")
         self.bofekcluster_name = bofeknames.loc[
             bofeknames["cluster"] == self.bofekcluster, "name"
         ].values[0]
 
+    @staticmethod
     def _get_data_csv(
-        self,
         csvfile: str,
         filter_profile: bool = False,
     ) -> DataFrame:
@@ -181,12 +237,83 @@ class SoilProfile:
         path = Path(__file__).parent / "data" / (csvfile + ".csv")
         data = read_csv(path, skiprows=10)
 
-        # Filter profile
-        if filter_profile:
-            mask = data["normalsoilprofile_id"] == self.index
-            data = data.loc[mask].reset_index(drop=True)
-
         return data
+
+    @staticmethod
+    def _validate_input(input_type, value):
+        """
+        Validates if given input for bofekcluster, code, or index exists in database.
+        """
+
+        if input_type == "bofekcluster":
+            valid = (
+                value in SoilProfile._get_data_csv("BofekClusters")["cluster"].values
+            )
+            msg = f"Given bofek cluster number '{value}' does not exist."
+        elif input_type == "index":
+            valid = (
+                value
+                in SoilProfile._get_data_csv("BofekClusters")[
+                    "normalsoilprofile_id"
+                ].values
+            )
+            msg = f"Given soilprofile index '{value}' does not exist."
+        elif input_type == "code":
+            valid = (
+                value in SoilProfile._get_data_csv("SoilProfiles")["soilunit"].values
+            )
+            msg = f"Given soilprofile code '{value}' does not exist."
+        else:
+            valid = False
+            msg = "Unknown input type."
+
+        if not valid:
+            raise ValueError(msg)
+        else:
+            return
+
+    @staticmethod
+    def _get_indices(
+        cluster: int | Iterable | None = None,
+        code: str | Iterable | None = None,
+    ):
+        """
+        Retrieves indices of soil profiles based on cluster or soil unit code.
+
+        Parameters
+        ----------
+        cluster : int or Iterable
+            Cluster identifier(s) to filter the mapping. If provided, indices are selected based on cluster.
+        code : str or Iterable
+            Soil unit code(s) to filter the mapping. Used if `cluster` is None.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of indices corresponding to the selected cluster(s) or soil unit code(s).
+        """
+
+        # Check if given input exists for both bofekcluster and soil unit code
+        variable = "bofekcluster" if cluster is not None else "code"
+        input = cluster if cluster is not None else code
+        values = (
+            input if SoilProfile._is_iterable(input) else [input]
+        )  # Make iterable if not already
+        for val in values:
+            SoilProfile._validate_input(variable, val)
+
+        # Set data csv file and column name for given input
+        name_csv = "BofekClusters" if cluster is not None else "SoilProfiles"
+        data = SoilProfile._get_data_csv(name_csv)
+        col = "cluster" if cluster is not None else "soilunit"
+
+        # Get indices belonging to this variable
+        indices_all = []
+        for val in values:
+            indices = list(data.loc[data[col] == val, "normalsoilprofile_id"])
+            indices_all += indices
+
+        return indices_all
 
     @staticmethod
     def _is_iterable(obj):
@@ -202,14 +329,10 @@ class SoilProfile:
         -------
         bool
         """
-        return isinstance(obj, Iterable) and not isinstance(obj, str)
+        return isinstance(obj, Iterable) and not isinstance(obj, str) and len(obj) > 0
 
     @classmethod
-    def _from_userinput(
-        cls,
-        input,
-        input_type: str,
-    ):
+    def _from_userinput(cls, input, input_type: str, **kwargs):
         """
         Creates one or more SoilProfile instances from user input.
 
@@ -224,46 +347,13 @@ class SoilProfile:
         -------
         SoilProfile or list of SoilProfile
         """
+
         # Return a list of Soilprofiles if input is an iterable
         if cls._is_iterable(input):
-            # Initiate SoilProfile for every cluster element
-            result = []
-            for ii in input:
-                try:
-                    result.append(cls(**{input_type: ii}))
-                except ValueError:
-                    # If input is invalid, give a warning and store a None
-                    warn(
-                        message=f"Given {input_type} '{ii}' is invalid, 'None' returned.",
-                        stacklevel=3,
-                    )
-                    result.append(None)
+            return [cls(**{input_type: ii}, **kwargs) for ii in input]
         # Else return a SoilProfile instance
         else:
-            result = cls(**{input_type: input})
-
-        return result
-
-    @classmethod
-    def from_bofekcluster(
-        cls,
-        cluster: int | Iterable,
-    ) -> "SoilProfile" | list["SoilProfile"]:
-        """
-        Create SoilProfile(s) from a BOFEK cluster number.
-
-        You can provide either a single bofek cluster number to get a single SoilProfile or an iterable of cluster numbers to obtain multiple SoilProfiles in a list.
-
-        Parameters
-        ----------
-        cluster : int or iterable of int
-            BOFEK cluster number(s). If an iterable of int is given, a list of SoilProfiles will be returned.
-
-        Returns
-        -------
-        SoilProfile or list of SoilProfile
-        """
-        return cls._from_userinput(input=cluster, input_type="bofekcluster")
+            return cls(**{input_type: input}, **kwargs)
 
     @classmethod
     def from_index(
@@ -287,6 +377,42 @@ class SoilProfile:
         return cls._from_userinput(input=index, input_type="index")
 
     @classmethod
+    def from_bofekcluster(
+        cls,
+        cluster: int | Iterable,
+        dominant: bool = True,
+    ) -> "SoilProfile" | list["SoilProfile"]:
+        """
+        Create SoilProfile(s) from a BOFEK cluster number.
+
+        You can provide either a single BOFEK cluster number or an iterable of cluster numbers.
+        Either only the dominant soil profile (default) or all profiles belonging to a cluster can be returned.
+
+        Parameters
+        ----------
+        cluster : int or iterable of int
+            BOFEK cluster number(s). If an iterable of int is given, a list of SoilProfiles will be returned.
+        dominant: bool
+            Whether to return the dominant (default) or all soil profiles belonging to a BOFEK cluster.
+
+        Returns
+        -------
+        SoilProfile or list of SoilProfile
+        """
+
+        if dominant:
+            # Only one SoilProfile per cluster will be returned, checks are done in __post_init
+            return cls._from_userinput(
+                input=cluster, input_type="bofekcluster", bofekcluster_dominant=True
+            )
+        else:
+            # Multiple SoilProfiles per cluster will be returned using from_index
+            # Get indices of all soilprofiles belonging to this BOFEK cluster
+            indices = cls._get_indices(cluster=cluster)
+
+            return cls._from_userinput(input=indices, input_type="index")
+
+    @classmethod
     def from_code(
         cls,
         code: str | Iterable,
@@ -294,7 +420,8 @@ class SoilProfile:
         """
         Create SoilProfile(s) from a soil profile code.
 
-        You can provide either a single soil profile code to get a single SoilProfile or an iterable of codes to obtain multiple SoilProfiles in a list.
+        You can provide either a single soil profile code or an iterable of codes.
+        When multiple soil profiles have the same soil code, all of these are returned.
 
         Parameters
         ----------
@@ -305,7 +432,12 @@ class SoilProfile:
         -------
         SoilProfile or list of SoilProfile
         """
-        return cls._from_userinput(input=code, input_type="code")
+        # Check if multiple soil profiles have the same soil code
+        indices = cls._get_indices(code=code)
+        # Make sure a SoilProfile object is returned if only one index corresponds with soil unit code
+        indices = indices[0] if len(indices) == 1 else indices
+
+        return cls._from_userinput(indices, "index")
 
     @classmethod
     def from_location(
@@ -499,7 +631,7 @@ class SoilProfile:
             An instance of the SoilProfile class corresponding to the provided map area ID.
         """
         # Load dataframe relating mapid to soilprofile index
-        df = cls._get_data_csv(self=None, csvfile="SoilProfiles_MapAreaID")
+        df = cls._get_data_csv(csvfile="SoilProfiles_MapAreaID")
 
         # Strip mapid from redudant information
         mapid_short = int(mapid[-5:])
@@ -537,7 +669,6 @@ class SoilProfile:
 
         # Get data
         data = self._get_data_csv("BofekClusters")
-
         # Return area of this profile
         if which == "profile":
             return data.loc[data["normalsoilprofile_id"] == self.index, "area"].iloc[0]
@@ -547,7 +678,7 @@ class SoilProfile:
         # Return ValueError
         else:
             raise ValueError(
-                f"Value '{which}' for which-parameter is invalid. Please use 'profile' or 'bofekcluster'."
+                f"Value '{which}' for variable 'which' is invalid. Please use 'profile' or 'bofekcluster'."
             )
 
     def get_data_horizons(
@@ -637,7 +768,11 @@ class SoilProfile:
                 Fitted hydraulic conductivity at saturation (cm d^-1)
         """
         # Get data horizons
-        dataall = self._get_data_csv("SoilHorizons", filter_profile=True)
+        dataall = self._get_data_csv("SoilHorizons")
+
+        # Filter profile
+        mask = dataall["normalsoilprofile_id"] == self.index
+        dataall = dataall.loc[mask].reset_index(drop=True)
 
         # Keep relevant columns
         column_names = [

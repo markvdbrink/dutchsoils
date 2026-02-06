@@ -9,30 +9,121 @@ from pandas.testing import assert_frame_equal
 from dutchsoils import SoilProfile
 
 
+def test_initialisation_soilprofile():
+    # CORRECT INPUT
+    # soil id
+    sp = SoilProfile(index=90110280)
+    assert sp.name == "Vorstvaaggronden; lemig fijn zand"
+
+    # soil code
+    sp = SoilProfile(code="kZn40A")
+    assert sp.name == "Kalkhoudende vlakvaaggronden; zeer fijn zand"
+
+    # bofek cluster
+    sp = SoilProfile(bofekcluster=3015, bofekcluster_dominant=True)
+    assert sp.name == "Veldpodzolgronden; leemarm en zwak lemig fijn zand"
+    assert sp.bofekcluster_name == "Zwak lemige zandgronden III"
+
+    # WRONG INPUT
+    # Test with incorrect input: no input
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile()
+    assert (
+        "Provide exactly one input: soilprofile index, code, or bofek cluster number."
+        in str(exc_info.value)
+    )
+
+    # Test with incorrect input: too much input
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(bofekcluster=1001, index=1001)
+    assert (
+        "Provide exactly one input: soilprofile index, code, or bofek cluster number."
+        in str(exc_info.value)
+    )
+
+    # Test with incorrect input: wrong soil id
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(index=999999)
+    assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: wrong soil code
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(code="test")
+    assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
+    # Test with incorrect input: soil code has more corresponding soilprofiles
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(code="Hn21")
+    assert (
+        "Specify the index to get one of them or use the method from_code() to get all."
+        in str(exc_info.value)
+    )
+
+    # Test with incorrect input: wrong cluster number
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(bofekcluster=999999)
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
+    # Test with incorrect input: bofek cluster dominance not specified
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(bofekcluster=3015)
+    assert "Please specify the attribute bofekcluster_dominant." in str(exc_info.value)
+    # Test with incorrect input: bofek cluster dominance False -> use from_bofekcluster() instead
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile(bofekcluster=3015, bofekcluster_dominant=False)
+    assert (
+        "To get all soilprofiles corresponding to this BOFEK cluster, use the method from_bofekcluster()."
+        in str(exc_info.value)
+    )
+
+
 def test_from_bofekcluster():
     # Test with correct input
-    SoilProfile.from_bofekcluster(3012)
-    SoilProfile.from_bofekcluster([3012, 1008])
+    sp = SoilProfile.from_bofekcluster(3012)
+    assert sp.bofekcluster_name == "Zwak lemige enkeerdgronden"
+    sps = SoilProfile.from_bofekcluster([3012, 1008])
+    assert (
+        sps[1].bofekcluster_name
+        == "Dunne veengronden: kleibovengrond op veen op zand I"
+    )
+
+    # Test with correct input: non dominant profiles
+    sps = list(SoilProfile.from_bofekcluster(4001, dominant=False))
+    indices = [sp.index for sp in sps]
+    ind_corr = [15520, 15530, 16150]
+    assert [i in ind_corr for i in indices] == [True] * 3
+
+    # Test with correct input: non dominant profiles
+    sps = list(SoilProfile.from_bofekcluster([4001, 3018], dominant=False))
+    indices = [sp.index for sp in sps]
+    ind_corr = [15520, 15530, 16150, 8101, 8041]
+    assert [i in ind_corr for i in indices] == [True] * 5
 
     # Test with incorrect input: wrong bofek
     with pytest.raises(ValueError) as exc_info:
         SoilProfile.from_bofekcluster(999999)
     assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
 
+    # Test with incorrect input: wrong bofek, non-dominant False
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_bofekcluster(999999, dominant=False)
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
+
     # Test with incorrect input: second element is wrong
-    with warnings.catch_warnings(record=True) as w:
-        result = SoilProfile.from_bofekcluster([3012, 999999])
-    assert len(w) == 1
-    assert "Given bofekcluster '999999' is invalid, 'None' returned." in str(
-        w[0].message
-    )
-    assert result[1] is None
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_bofekcluster([3012, 999999])
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
+
+    # Test with incorrect input: second element is wrong, non-dominant False
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_bofekcluster([3012, 999999], dominant=False)
+    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
 
 
 def test_from_index():
     # Test with correct input
-    SoilProfile.from_index(90110280)
-    SoilProfile.from_index([90110280, 3030])
+    sp = SoilProfile.from_index(90110280)
+    assert sp.name == "Vorstvaaggronden; lemig fijn zand"
+    sps = SoilProfile.from_index([90110280, 3030])
+    assert sps[1].name == "Holtpodzolgronden; grof zand"
 
     # Test with incorrect input: wrong index
     with pytest.raises(ValueError) as exc_info:
@@ -40,17 +131,17 @@ def test_from_index():
     assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
 
     # Test with incorrect input: second element is wrong
-    with warnings.catch_warnings(record=True) as w:
-        result = SoilProfile.from_index([3030, 999999])
-    assert len(w) == 1
-    assert "Given index '999999' is invalid, 'None' returned." in str(w[0].message)
-    assert result[1] is None
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_index([3030, 999999])
+    assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
 
 
 def test_from_code():
     # Test with correct input
-    SoilProfile.from_code("Zn21")
-    SoilProfile.from_code(["Zn21", "bEZ23"])
+    sps = SoilProfile.from_code("Zn21")
+    assert [10186, 90110186, 90210186] == [sp.index for sp in sps]
+    sps = SoilProfile.from_code(["Zn21", "bEZ23"])
+    assert [10186, 90110186, 90210186, 9018040, 9028040] == [sp.index for sp in sps]
 
     # Test with incorrect input: wrong index
     with pytest.raises(ValueError) as exc_info:
@@ -58,11 +149,9 @@ def test_from_code():
     assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
 
     # Test with incorrect input: second element is wrong
-    with warnings.catch_warnings(record=True) as w:
-        result = SoilProfile.from_code(["Zn21", "test"])
-    assert len(w) == 1
-    assert "Given code 'test' is invalid, 'None' returned." in str(w[0].message)
-    assert result[1] is None
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_code(["Zn21", "test"])
+    assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
 
 
 def test_from_location():
@@ -226,52 +315,9 @@ def test_from_location():
     assert "Unsupported CRS: test. Please use format 'EPSG:XXX'." in str(exc_info.value)
 
 
-def test_initialisation_soilprofile():
-    # CORRECT INPUT
-    # soil id
-    SoilProfile(index=90110280)
-
-    # soil code
-    SoilProfile(code="Zn21")
-
-    # bofek cluster
-    SoilProfile(bofekcluster=3002)
-
-    # WRONG INPUT
-    # Test with incorrect input: no input
-    with pytest.raises(ValueError) as exc_info:
-        SoilProfile()
-    assert "Provide a soilprofile index or code or a bofek cluster number." in str(
-        exc_info.value
-    )
-
-    # Test with incorrect input: too much input
-    with pytest.raises(ValueError) as exc_info:
-        SoilProfile(bofekcluster=1001, index=1001)
-    assert (
-        "Provide only one input: soilprofile index, code or a bofek cluster number, not multiple."
-        in str(exc_info.value)
-    )
-
-    # Test with incorrect input: wrong soil id
-    with pytest.raises(ValueError) as exc_info:
-        SoilProfile(index=999999)
-    assert "Given soilprofile index '999999' does not exist." in str(exc_info.value)
-
-    # Test with incorrect input: wrong soil code
-    with pytest.raises(ValueError) as exc_info:
-        SoilProfile(code="test")
-    assert "Given soilprofile code 'test' does not exist." in str(exc_info.value)
-
-    # Test with incorrect input: wrong bofek
-    with pytest.raises(ValueError) as exc_info:
-        SoilProfile(bofekcluster=999999)
-    assert "Given bofek cluster number '999999' does not exist." in str(exc_info.value)
-
-
 def test_get_area():
     # Get soilprofile
-    sp = SoilProfile(bofekcluster=3015)
+    sp = SoilProfile(bofekcluster=3015, bofekcluster_dominant=True)
 
     # Get area from profile
     area = sp.get_area()
@@ -281,10 +327,18 @@ def test_get_area():
     area = sp.get_area(which="bofekcluster")
     assert area == 335205.67601799994
 
+    # Wrong input
+    with pytest.raises(ValueError) as exc_info:
+        SoilProfile.from_bofekcluster(3015).get_area(which="test")
+    assert (
+        "Value 'test' for variable 'which' is invalid. Please use 'profile' or 'bofekcluster'."
+        in str(exc_info.value)
+    )
+
 
 def test_get_data_horizons():
     # Get soilprofile
-    sp = SoilProfile(bofekcluster=1008)
+    sp = SoilProfile(bofekcluster=1008, bofekcluster_dominant=True)
 
     # Test which=all
     # Data to test
@@ -349,7 +403,7 @@ def test_get_data_horizons():
 
 def test_swapsoilprofile():
     # Get soil profile
-    sp = SoilProfile(bofekcluster=1001)
+    sp = SoilProfile(bofekcluster=1001, bofekcluster_dominant=True)
 
     # Test for discretisation that aligns well with soil physical layering
     # Get correct dataframes
@@ -398,7 +452,7 @@ def test_swaphydraulicparams():
     hf_ref = read_csv(path)
 
     # Get soil profile
-    sp = SoilProfile(bofekcluster=1001)
+    sp = SoilProfile(bofekcluster=1001, bofekcluster_dominant=True)
 
     # Get output to test
     hf_test = DataFrame(sp.get_swapinput_hydraulicparams())
@@ -417,7 +471,7 @@ def test_swapfractions():
     frac_ref = read_csv(path)
 
     # Get soil profile
-    sp = SoilProfile(bofekcluster=1001)
+    sp = SoilProfile(bofekcluster=1001, bofekcluster_dominant=True)
 
     # Get output to test
     frac_test = DataFrame(sp.get_swapinput_fractions())
@@ -435,7 +489,7 @@ def test_swapcofani():
     cof_ref = [1.0, 1.0, 1.0, 1.0]
 
     # Get soil profile
-    sp = SoilProfile(bofekcluster=1001)
+    sp = SoilProfile(bofekcluster=1001, bofekcluster_dominant=True)
 
     # Get output to test
     cof_test = sp.get_swapinput_cofani()
@@ -445,5 +499,5 @@ def test_swapcofani():
 
 
 def test_plot():
-    SoilProfile(bofekcluster=3015).plot()
+    SoilProfile(bofekcluster=3015, bofekcluster_dominant=True).plot()
     SoilProfile(index=1050).plot()
