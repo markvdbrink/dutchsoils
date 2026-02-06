@@ -12,9 +12,6 @@ It contains code to get soil physical, textural, chemical data from the [Dutch S
 > [!Note]
 > The data and soil profiles in this package are not actual measurements but are **derived** from field measurements. It is assumed that the soil profile and associated data are typical for the soil at a certain location.
 
-> [!Note]
-> The method `from_location()` uses the API of [soilphysics.wur.nl](https://soilphysics.wur.nl) to get the soil profile at a location. This website uses the outdated soil map from 1999. Please check https://bodemdata.nl/documentatie if your location is within an area which was updated in the last 25 years. If so, please do not use this method.
-
 ## Get started
 
 The easiest way to install the package is through `pip`:
