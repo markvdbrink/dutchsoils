@@ -1038,9 +1038,18 @@ class SoilProfile:
 
         return [1.0] * len(data.index)
 
-    def plot(self) -> None:
+    def plot(self, which: str = "all") -> None:
         """
         Plots the soil profile using the DutchSoils visualization.
+
+        Parameters
+        ----------
+        which : str, optional
+            Which data to plot (default: "all"). Options:
+                * "all": Combination of hydraulic, physical, and chemical data.
+                * "hydraulic": Staring series data.
+                * "physical": Mass fractions, density.
+                * "chemical": Organic matter, calcite, iron oxide, acidity.
 
         Returns
         -------
@@ -1051,4 +1060,4 @@ class SoilProfile:
         The actual plotting is delegated to the `plot_soilprofile` function.
         """
 
-        plot_soilprofile(self)
+        return plot_soilprofile(self, which)
