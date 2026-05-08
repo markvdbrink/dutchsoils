@@ -1,7 +1,9 @@
 import matplotlib as mpl
+import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
-import pedon as pe
+import pedon
+from matplotlib.legend_handler import HandlerTuple
 
 # Set default colors for each soil type
 COLORS_SOILS = {
@@ -53,16 +55,10 @@ COLORS_SOILS = {
     "O18": "#00cc00",
 }
 
-# Set default colors for each soil group
-COLORS_SOILGROUPS = {
-    ">50µm": "#f6e0b5",  # yellow
-    ">2µm\n<50µm": "#80d4ff",  # light blue
-    "<2µm": "#cc99ff",  # purple
-}
-
 
 def soilprofile(
     soilprofile,
+    which: str,
 ) -> plt.Figure:
     """
     Plot a comprehensive visualization of a soil profile, including profile layers, hydraulic properties, texture fractions, and organic matter content.
@@ -76,6 +72,12 @@ def soilprofile(
     ----------
     soilprofile : SoilProfile
         An object representing the soil profile, expected to provide a `get_data()` method returning a DataFrame with required soil properties.
+    which : str, optional
+        Which data to plot (default: "all"). Options:
+            * "all": Combination of hydraulic, physical, and chemical data.
+            * "hydraulic": Staring series data.
+            * "physical": Mass fractions, density.
+            * "chemical": Organic matter, calcite, iron oxide, acidity.
 
     Returns
     -------
@@ -88,45 +90,125 @@ def soilprofile(
     >>> fig.show()
     """
 
-    # Get data
+    # Get data of soil horizons
     data = soilprofile.get_data_horizons(which="all")
     data = data.set_index("layernumber")
 
+    # Define figure dimensions for each data dype
+    ncols = {
+        "all": 6,
+        "hydraulic": 2,
+        "chemical": 3,
+        "physical": 3,
+    }
+
+    width_ratios = {
+        "all": [1.1, 1, 1, 1, 1, 1.75],
+        "hydraulic": [1.2, 1.75],
+        "chemical": [1.2, 1, 1],
+        "physical": [1.2, 1, 1],
+    }
+
     # Plot figure
     fig = plt.figure(
-        figsize=(10, 5),
+        figsize=(sum(width_ratios[which]) * 2, 5),
         layout="constrained",
     )
+    # Make a gridspec for the different subplots
+    gs = mpl.gridspec.GridSpec(
+        nrows=2,
+        ncols=ncols[which],
+        width_ratios=width_ratios[which],
+        figure=fig,
+    )
 
-    # Use a gridspec, derive axes
-    gs = mpl.gridspec.GridSpec(nrows=2, ncols=3, width_ratios=[1.2, 2, 2], figure=fig)
-    ax1 = fig.add_subplot(gs[:, 0])
-    ax2 = fig.add_subplot(gs[0, 1])
-    ax3 = fig.add_subplot(gs[1, 1])
-    ax4 = fig.add_subplot(gs[0, 2])
-    ax5 = fig.add_subplot(gs[1, 2])
+    # Set fontsizes
+    context = {
+        "figure.dpi": 100,
+        "figure.titlesize": 9,
+        "axes.titlesize": 8,
+        "axes.labelsize": 8,
+        "axes.grid": True,
+        "grid.color": "lightgrey",
+        "axes.axisbelow": True,
+        "xtick.labelsize": 7,
+        "ytick.labelsize": 7,
+        "legend.fontsize": 8,
+        "font.size": 8,
+        "font.family": "DejaVu Sans",
+    }
 
-    # Counter to account for duplicate staring series blocks
-    staring_count = 0
+    with mpl.rc_context(context):
+        # Plot different data types
+        ax_sp = fig.add_subplot(gs[:, 0])
+        plot_profile(ax_sp, data)
 
-    # Linestyles
-    linestyles = ["-", "--", ":", "-."]
+        if which == "all" or which == "hydraulic":
+            ax_swrc = (
+                fig.add_subplot(gs[0, 5])
+                if which == "all"
+                else fig.add_subplot(gs[0, 1])
+            )
+            ax_shcc = (
+                fig.add_subplot(gs[1, 5], sharex=ax_swrc)
+                if which == "all"
+                else fig.add_subplot(gs[1, 1], sharex=ax_swrc)
+            )
+            plot_hydraulic_data(ax_swrc=ax_swrc, ax_shcc=ax_shcc, data=data)
+
+        if which == "all" or which == "chemical":
+            ax_cont = fig.add_subplot(gs[:, 1])
+            ax_ac = fig.add_subplot(gs[:, 2])
+            plot_chemical_data(ax_cont=ax_cont, ax_ac=ax_ac, data=data)
+
+        if which == "all" or which == "physical":
+            ax_bd = (
+                fig.add_subplot(gs[:, 3])
+                if which == "all"
+                else fig.add_subplot(gs[:, 1])
+            )
+            ax_tex = (
+                fig.add_subplot(gs[:, 4])
+                if which == "all"
+                else fig.add_subplot(gs[:, 2])
+            )
+            plot_physical_data(ax_bd=ax_bd, ax_tex=ax_tex, data=data)
+
+        # Set title of plot for input soil or bofek cluster soil
+        title = (
+            "Soil profile "
+            + str(soilprofile.code)
+            + " ("
+            + str(soilprofile.index)
+            + "): "
+            + str(soilprofile.name)
+            + "\nBofek cluster "
+            + str(soilprofile.bofekcluster)
+            + ": "
+            + str(soilprofile.bofekcluster_name)
+        )
+        if soilprofile.bofekcluster_dominant:
+            title += " (dominant)"
+        else:
+            title += " (not dominant)"
+        fig.suptitle(title)
+
+    return fig
+
+
+def plot_profile(ax_sp, data):
     hatches = {
         "B": "/",
         "O": ".",
     }
-    height = None
 
     # Plot soil profile as bars
-    for count, layer in zip(range(1, len(data) + 1), data.index):
-        # SUBPLOT 1: Soil profile
-
-        # Get depth and height of layer
-        zbot = data.loc[layer, "zbottom"] * -100  # cm depth
-        height = data.loc[layer, "ztop"] * -100 - zbot  # cm height
+    for layer in data.index:
+        # Get bottom level and height of layer
+        zbot, height = get_z(data, layer)
 
         # Plot profile as bar plot
-        ax1.bar(
+        ax_sp.bar(
             x=0,
             height=height,
             bottom=zbot,
@@ -137,167 +219,243 @@ def soilprofile(
             edgecolor="darkgray",
         )
 
-        # Plot Staring class number and description for each layer
+        # Plot FAO horizon description and Staring class number and name for each layer
         string = (
-            f"Horizon {count}\n"
+            f"Horizon {layer + 1}: "
+            + data.loc[layer, "faohorizonnotation"]
+            + "\n"
             + data.loc[layer, "staringseriesblock"]
             + ": "
             + data.loc[layer, "staringblocklabel"]
         )
-        ax1.text(
+        ax_sp.text(
             x=0,
             y=zbot + height / 2,
             s=string,
             ha="center",
             va="center",
-            fontsize=8,
+            path_effects=[pe.withStroke(linewidth=2, foreground="white")],
         )
 
-        # Because of duplicates: plot if staring block is not plotted yet
-        blocks_plotted = [line.get_label() for line in ax2.get_lines()]
-        if data.loc[layer, "staringseriesblock"] not in blocks_plotted:
-            # Define range of pressure heads
-            h = np.logspace(-3, 10, 1000) * -1
+    # Layout
+    ax_sp.set_ylim(-120, 0)
+    ax_sp.set_yticks(np.arange(-120, 10, 10))
+    ax_sp.set_ylabel("Depth [cm]")
+    ax_sp.set_xlim(-1, 1)
+    ax_sp.set_xticks([0], [None])
+    ax_sp.set_title("Soil profile")
 
-            # Define pedon soilmodel
-            shf = pe.Genuchten(
-                theta_r=data.loc[layer, "wcres"],
-                theta_s=data.loc[layer, "wcsat"],
-                alpha=data.loc[layer, "vgmalpha"],
-                n=data.loc[layer, "vgmnpar"],
-                k_s=data.loc[layer, "ksatfit"],
-                l=data.loc[layer, "vgmlambda"],
-            )
 
-            # SUBPLOT 2: Soil water retention curve
-            ax2.plot(
-                h,
-                shf.theta(h=-h),  # requires positive pressure heads
-                label=data.loc[layer, "staringseriesblock"],
-                color=COLORS_SOILS[data.loc[layer, "staringseriesblock"]],
-                linestyle=linestyles[staring_count % 4],
-            )
+def plot_hydraulic_data(ax_swrc, ax_shcc, data):
+    linestyles = ["-", "--", ":", "-."]
 
-            # SUBPLOT 3: Soil hydraulic conductivity
-            ax3.plot(
-                h,
-                shf.k(h=-h),  # requires positive pressure heads
-                label=data.loc[layer, "staringseriesblock"],
-                color=COLORS_SOILS[data.loc[layer, "staringseriesblock"]],
-                linestyle=linestyles[staring_count % 4],
-            )
+    for count, block in enumerate(data["staringseriesblock"].unique()):
+        # Define range of pressure heads
+        # Take positive values which are required for pedon
+        # and allow for easier plotting. Make negative by adjusting the ticks.
+        powmin = -1
+        powmax = 6
+        pown = powmax - powmin + 1
+        h = np.logspace(powmin, powmax, 100)
 
-            # Increase staring blocks counter
-            staring_count += 1
+        # If multiple horizons with the same block, use the first one
+        row = data[data["staringseriesblock"] == block].head(1)
 
-        # SUBPLOT 4: Soil texture
-        pclay = data.loc[layer, "lutitecontent"]
-        psilt = data.loc[layer, "siltcontent"]
+        # Define pedon soilmodel
+        shf = pedon.Genuchten(
+            theta_r=row["wcres"].item(),
+            theta_s=row["wcsat"].item(),
+            alpha=row["vgmalpha"].item(),
+            n=row["vgmnpar"].item(),
+            k_s=row["ksatfit"].item(),
+            l=row["vgmlambda"].item(),
+        )
+
+        # Plot soil water retention curve
+        ax_swrc.plot(
+            h,
+            shf.theta(h=h),
+            label=block,
+            color=COLORS_SOILS[block],
+            linestyle=linestyles[count % 4],
+        )
+
+        # Plot soil hydraulic conductivity
+        ax_shcc.plot(
+            h,
+            shf.k(h=h),
+            label=block,
+            color=COLORS_SOILS[block],
+            linestyle=linestyles[count % 4],
+        )
+
+    # Layout soil water retention curve
+    ax_swrc.legend()
+    ax_swrc.set_xscale("log")
+    ax_swrc.set_xlim(10**powmin, 10**powmax)
+    ax_swrc.set_xticks(np.logspace(powmin, powmax, pown), [None] * pown)
+    ax_swrc.set_ylabel("Water content\n[$cm^3/cm^{3}$]")
+    ax_swrc.set_title("Soil Water Retention & Conductivity Curve")
+
+    # Layout soil hydraulic conductivity curve
+    ax_shcc.legend()
+    ax_shcc.set_xscale("log")
+    ax_shcc.set_xlim(10**powmin, 10**powmax)
+    ax_shcc.set_xlabel("Pressure head [cm]")
+    ax_shcc.set_xticks(
+        np.logspace(powmin, powmax, pown),
+        [f"$10^{{{pow}}}$" for pow in np.arange(powmin, powmax + 1)],
+    )
+    ax_shcc.set_yscale("log")
+    ax_shcc.set_ylim(1e-10, 1e3)
+    ax_shcc.set_ylabel("Hydraulic conductivity\n[$cm/d$]")
+
+
+def plot_chemical_data(ax_cont, ax_ac, data):
+    for layer in data.index:
+        # Get bottom level and height of layer
+        zbot, height = get_z(data=data, layer=layer)
+
+        # PLOT CONTENTS
+
+        # Plot 10th and 90th percentile organic matter content
+        ax_cont.fill_between(
+            x=data.loc[layer, ["organicmattercontent10p", "organicmattercontent90p"]]
+            .astype(float)
+            .values,
+            y1=zbot,
+            y2=zbot + height,
+            color="saddlebrown",
+            alpha=0.4,
+            edgecolor="None",
+            label="OM 10-90p" if layer == 1 else None,
+        )
+
+        # Plot median organic matter content
+        ax_cont.vlines(
+            x=data.loc[layer, "organicmattercontent"].item(),
+            ymax=zbot,
+            ymin=zbot + height,
+            color="saddlebrown",
+            label="OM median" if layer == 1 else None,
+        )
+
+        # Plot iron and calcite content
+        ax_cont.vlines(
+            x=data.loc[layer, "calciccontent"].item(),
+            ymin=zbot,
+            ymax=zbot + height,
+            color="orange",
+            label="Calcite" if layer == 1 else None,
+        )
+        ax_cont.vlines(
+            x=data.loc[layer, "fedith"].item(),
+            ymin=zbot,
+            ymax=zbot + height,
+            color="deepskyblue",
+            label="Fe$_{2}$O$_{3}$" if layer == 1 else None,
+        )
+
+        # PLOT ACIDITY
+
+        # Plot 10th and 90th percentile pH
+        ax_ac.fill_between(
+            x=data.loc[layer, ["acidity10p", "acidity90p"]].astype(float).values,
+            y1=zbot,
+            y2=zbot + height,
+            color="cyan",
+            alpha=0.15,
+            edgecolor="None",
+            label="pH 10-90p" if layer == 1 else None,
+        )
+
+        # Plot median pH
+        ax_ac.vlines(
+            x=data.loc[layer, "acidity"].item(),
+            ymin=zbot + height,
+            ymax=zbot,
+            color="cyan",
+            label="pH median" if layer == 1 else None,
+        )
+
+    # Layout contents plot
+    ax_cont.set_title("Compounds")
+    ax_cont.set_xlabel("Content [mass-%]")
+    ax_cont.set_ylim(-120, 0)
+    ax_cont.set_yticks(np.arange(-120, 10, 10), [None] * 13)
+    handles, labels = ax_cont.get_legend_handles_labels()
+    ax_cont.legend(
+        [(handles[0], handles[1])] + handles[2:],
+        ["Organic matter\n(10-90% & median)"] + labels[2:],
+        handler_map={tuple: HandlerTuple(ndivide=1)},
+    )
+
+    # Layout contents plot
+    ax_ac.set_title("Acidity")
+    ax_ac.set_xlabel("pH")
+    ax_ac.set_ylim(-120, 0)
+    ax_ac.set_yticks(np.arange(-120, 10, 10), [None] * 13)
+    handles, labels = ax_ac.get_legend_handles_labels()
+    ax_ac.legend(
+        [(handles[0], handles[1])] + handles[2:],
+        ["pH\n(10-90% & median)"] + labels[2:],
+        handler_map={tuple: HandlerTuple(ndivide=1)},
+    )
+
+
+def plot_physical_data(ax_bd, ax_tex, data):
+    for layer in data.index:
+        # Get bottom and height of horizon
+        zbot, height = get_z(data=data, layer=layer)
+
+        # SUBPLOT BULK DENSITY
+        ax_bd.plot(
+            [data.loc[layer, "density"].item()] * 2,
+            [zbot, zbot + height],
+            color="k",
+        )
+
+        # SUBPLOT SOIL TEXTURE
+        pclay = data.loc[layer, "lutitecontent"].item()
+        psilt = data.loc[layer, "siltcontent"].item()
         psand = 100 - pclay - psilt
-        bot = 0
-        for soilgroup, fraction in zip(
-            ["<2µm", ">2µm\n<50µm", ">50µm"], [pclay, psilt, psand]
+        left = 0
+
+        for fraction, label, color in zip(
+            [pclay, psilt, psand],
+            ["<2µm", ">2µm\n<50µm", ">50µm"],
+            ["#f6e0b5", "#80d4ff", "#cc99ff"],
         ):
             # Plot fractions
-            ax4.bar(
-                x=count,
-                height=fraction,
-                bottom=bot,
-                width=0.8,
-                color=COLORS_SOILGROUPS[soilgroup],
-                edgecolor="dimgrey",
+            ax_tex.fill_between(
+                x=[left, left + fraction],
+                y1=zbot,
+                y2=zbot + height,
+                color=color,
+                edgecolor="None",
+                label=label if layer == 1 else None,
+                alpha=0.75,
             )
-            # Plot label
-            ax4.text(
-                x=count,
-                y=bot + fraction / 2,
-                s=soilgroup,
-                ha="center",
-                va="center",
-                fontsize=7,
-                color="dimgrey",
-            )
-            bot += fraction
+            left += fraction
 
-        # SUBPLOT 5: Soil organic matter
-        ax5.bar(
-            x=count,
-            height=data.loc[layer, "organicmattercontent"],
-            width=0.8,
-            color="saddlebrown",
-            edgecolor="dimgrey",
-        )
+    # Layout bulk density
+    ax_bd.set_title("Bulk density")
+    ax_bd.set_xlabel("Bulk density [g/cm$^{3}$]")
+    ax_bd.set_ylim(-120, 0)
+    ax_bd.set_yticks(np.arange(-120, 10, 10), [None] * 13)
 
-    # Layout subplot 1
-    ax1.set_ylim(-120, 0)
-    ax1.set_yticks(np.arange(-120, 10, 10))
-    ax1.set_ylabel("Depth [cm]")
-    ax1.set_xlim(-1, 1)
-    ax1.set_xticks([0], [None])
-    ax1.set_axisbelow(True)
-    ax1.grid(color="lightgrey")
-    ax1.set_title("Soil profile", fontsize=8)
+    # Layout texture
+    ax_tex.set_title("Texture")
+    ax_tex.set_xlabel("Particle size fraction [%]")
+    ax_tex.legend()
+    ax_tex.set_xlim(0, 100)
+    ax_tex.set_xticks(np.arange(0, 110, 20))
+    ax_tex.set_ylim(-120, 0)
+    ax_tex.set_yticks(np.arange(-120, 10, 10), [None] * 13)
 
-    # Layout subplot 2
-    ax2.legend()
-    ax2.set_xscale("symlog")
-    ax2.set_xlim(-1e-1, -1e6)
-    ax2.set_xticks(np.logspace(-1, 6, 8) * -1, [None] * 8)
-    ax2.set_ylabel("Water content\n[$cm^3/cm^{3}$]")
-    ax2.set_title("Soil Water Retention & Conductivity Curve", fontsize=8)
-    ax2.set_axisbelow(True)
-    ax2.grid(color="lightgrey")
 
-    # Layout subplot 3
-    ax3.legend()
-    ax3.set_xscale("symlog")
-    ax3.set_xlim(-1e-1, -1e6)
-    ax3.set_xlabel("Pressure head [cm]")
-    ax3.set_yscale("log")
-    ax3.set_ylim(1e-10, 1e3)
-    ax3.set_ylabel("Hydraulic conductivity\n[$cm/d$]")
-    ax3.set_axisbelow(True)
-    ax3.grid(color="lightgrey")
-
-    # Layout subplot 4
-    ax4.set_ylim(0, 100)
-    ax4.set_ylabel("Particle size fraction [%]")
-    ax4.set_yticks(np.arange(0, 110, 10))
-    ax4.set_title("Soil Texture & Organic Matter Content", fontsize=8)
-    ax4.set_xticks(
-        range(1, count + 1),
-        [None] * count,
-    )
-    ax4.set_axisbelow(True)
-    ax4.grid(color="lightgrey")
-
-    # Layout subplot 5
-    ax5.set_ylabel("Organic matter content [%]")
-    # ax5.set_title("Soil organic matter", fontsize=8)
-    ax5.set_xlabel("Soil horizon")
-    ax5.set_xticks(
-        range(1, count + 1),
-    )
-    ax5.set_axisbelow(True)
-    ax5.grid(color="lightgrey")
-
-    # Get title of plot for input soil or bofek cluster soil
-    title = (
-        "Soil profile "
-        + str(soilprofile.code)
-        + " ("
-        + str(soilprofile.index)
-        + "): "
-        + str(soilprofile.name)
-        + "\nBofek cluster "
-        + str(soilprofile.bofekcluster)
-        + ": "
-        + str(soilprofile.bofekcluster_name)
-    )
-    if soilprofile.bofekcluster_dominant:
-        title += " (dominant)"
-    else:
-        title += " (not dominant)"
-    fig.suptitle(title)
-
-    return fig
+def get_z(data, layer):
+    # Get depth and height of layer
+    zbot = data.loc[layer, "zbottom"].item() * -100  # cm depth
+    height = data.loc[layer, "ztop"].item() * -100 - zbot  # cm height
+    return zbot, height
