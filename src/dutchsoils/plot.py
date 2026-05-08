@@ -1,7 +1,9 @@
 import matplotlib as mpl
+import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
-import pedon as pe
+import pedon
+from matplotlib.legend_handler import HandlerTuple
 
 # Set default colors for each soil type
 COLORS_SOILS = {
@@ -123,15 +125,15 @@ def soilprofile(
     # Set fontsizes
     context = {
         "figure.dpi": 100,
-        "figure.titlesize": 10,
+        "figure.titlesize": 9,
         "axes.titlesize": 8,
-        "axes.labelsize": 9,
+        "axes.labelsize": 8,
         "axes.grid": True,
+        "grid.color": "lightgrey",
         "axes.axisbelow": True,
-        "xtick.labelsize": 8,
-        "ytick.labelsize": 8,
-        "legend.fontsize": 9,
-        "legend.title_fontsize": 9,
+        "xtick.labelsize": 7,
+        "ytick.labelsize": 7,
+        "legend.fontsize": 8,
         "font.size": 8,
         "font.family": "DejaVu Sans",
     }
@@ -232,6 +234,7 @@ def plot_profile(ax_sp, data):
             s=string,
             ha="center",
             va="center",
+            path_effects=[pe.withStroke(linewidth=2, foreground="white")],
         )
 
     # Layout
@@ -240,8 +243,6 @@ def plot_profile(ax_sp, data):
     ax_sp.set_ylabel("Depth [cm]")
     ax_sp.set_xlim(-1, 1)
     ax_sp.set_xticks([0], [None])
-    ax_sp.set_axisbelow(True)
-    ax_sp.grid(color="lightgrey")
     ax_sp.set_title("Soil profile")
 
 
@@ -250,13 +251,18 @@ def plot_hydraulic_data(ax_swrc, ax_shcc, data):
 
     for count, block in enumerate(data["staringseriesblock"].unique()):
         # Define range of pressure heads
-        h = np.logspace(-3, 10, 1000) * -1
+        # Take positive values which are required for pedon
+        # and allow for easier plotting. Make negative by adjusting the ticks.
+        powmin = -1
+        powmax = 6
+        pown = powmax - powmin + 1
+        h = np.logspace(powmin, powmax, 100)
 
         # If multiple horizons with the same block, use the first one
         row = data[data["staringseriesblock"] == block].head(1)
 
         # Define pedon soilmodel
-        shf = pe.Genuchten(
+        shf = pedon.Genuchten(
             theta_r=row["wcres"].item(),
             theta_s=row["wcsat"].item(),
             alpha=row["vgmalpha"].item(),
@@ -268,7 +274,7 @@ def plot_hydraulic_data(ax_swrc, ax_shcc, data):
         # Plot soil water retention curve
         ax_swrc.plot(
             h,
-            shf.theta(h=-h),  # requires positive pressure heads
+            shf.theta(h=h),
             label=block,
             color=COLORS_SOILS[block],
             linestyle=linestyles[count % 4],
@@ -277,7 +283,7 @@ def plot_hydraulic_data(ax_swrc, ax_shcc, data):
         # Plot soil hydraulic conductivity
         ax_shcc.plot(
             h,
-            shf.k(h=-h),  # requires positive pressure heads
+            shf.k(h=h),
             label=block,
             color=COLORS_SOILS[block],
             linestyle=linestyles[count % 4],
@@ -285,25 +291,24 @@ def plot_hydraulic_data(ax_swrc, ax_shcc, data):
 
     # Layout soil water retention curve
     ax_swrc.legend()
-    ax_swrc.set_xscale("symlog")
-    ax_swrc.set_xlim(-1e-1, -1e6)
-    ax_swrc.set_xticks(np.logspace(-1, 6, 8) * -1, [None] * 8)
+    ax_swrc.set_xscale("log")
+    ax_swrc.set_xlim(10**powmin, 10**powmax)
+    ax_swrc.set_xticks(np.logspace(powmin, powmax, pown), [None] * pown)
     ax_swrc.set_ylabel("Water content\n[$cm^3/cm^{3}$]")
     ax_swrc.set_title("Soil Water Retention & Conductivity Curve")
-    ax_swrc.set_axisbelow(True)
-    ax_swrc.grid(color="lightgrey")
 
     # Layout soil hydraulic conductivity curve
     ax_shcc.legend()
-    ax_shcc.set_xscale("symlog")
-    ax_shcc.set_xlim(-1e-1, -1e6)
+    ax_shcc.set_xscale("log")
+    ax_shcc.set_xlim(10**powmin, 10**powmax)
     ax_shcc.set_xlabel("Pressure head [cm]")
-    ax_shcc.set_xticks(np.logspace(-1, 6, 8) * -1)
+    ax_shcc.set_xticks(
+        np.logspace(powmin, powmax, pown),
+        [f"$10^{{{pow}}}$" for pow in np.arange(powmin, powmax + 1)],
+    )
     ax_shcc.set_yscale("log")
     ax_shcc.set_ylim(1e-10, 1e3)
     ax_shcc.set_ylabel("Hydraulic conductivity\n[$cm/d$]")
-    ax_shcc.set_axisbelow(True)
-    ax_shcc.grid(color="lightgrey")
 
 
 def plot_chemical_data(ax_cont, ax_ac, data):
@@ -313,14 +318,6 @@ def plot_chemical_data(ax_cont, ax_ac, data):
 
         # PLOT CONTENTS
 
-        # Plot median organic matter content
-        ax_cont.plot(
-            [data.loc[layer, "organicmattercontent"].item()] * 2,
-            [zbot, zbot + height],
-            color="saddlebrown",
-            label="OM median" if layer == 1 else None,
-        )
-
         # Plot 10th and 90th percentile organic matter content
         ax_cont.fill_between(
             x=data.loc[layer, ["organicmattercontent10p", "organicmattercontent90p"]]
@@ -329,63 +326,81 @@ def plot_chemical_data(ax_cont, ax_ac, data):
             y1=zbot,
             y2=zbot + height,
             color="saddlebrown",
-            alpha=0.5,
+            alpha=0.4,
             edgecolor="None",
             label="OM 10-90p" if layer == 1 else None,
         )
 
+        # Plot median organic matter content
+        ax_cont.vlines(
+            x=data.loc[layer, "organicmattercontent"].item(),
+            ymax=zbot,
+            ymin=zbot + height,
+            color="saddlebrown",
+            label="OM median" if layer == 1 else None,
+        )
+
         # Plot iron and calcite content
-        ax_cont.plot(
-            [data.loc[layer, "calciccontent"].item()] * 2,
-            [zbot, zbot + height],
+        ax_cont.vlines(
+            x=data.loc[layer, "calciccontent"].item(),
+            ymin=zbot,
+            ymax=zbot + height,
             color="orange",
             label="Calcite" if layer == 1 else None,
         )
-        ax_cont.plot(
-            [data.loc[layer, "fedith"].item()] * 2,
-            [zbot, zbot + height],
+        ax_cont.vlines(
+            x=data.loc[layer, "fedith"].item(),
+            ymin=zbot,
+            ymax=zbot + height,
             color="deepskyblue",
             label="Fe$_{2}$O$_{3}$" if layer == 1 else None,
         )
 
         # PLOT ACIDITY
 
-        # Plot median organic matter content
-        ax_ac.plot(
-            [data.loc[layer, "acidity"].item()] * 2,
-            [zbot, zbot + height],
-            color="cyan",
-            label="pH median" if layer == 1 else None,
-        )
-
-        # Plot 10th and 90th percentile organic matter content
+        # Plot 10th and 90th percentile pH
         ax_ac.fill_between(
             x=data.loc[layer, ["acidity10p", "acidity90p"]].astype(float).values,
             y1=zbot,
             y2=zbot + height,
             color="cyan",
-            alpha=0.2,
+            alpha=0.15,
             edgecolor="None",
             label="pH 10-90p" if layer == 1 else None,
+        )
+
+        # Plot median pH
+        ax_ac.vlines(
+            x=data.loc[layer, "acidity"].item(),
+            ymin=zbot + height,
+            ymax=zbot,
+            color="cyan",
+            label="pH median" if layer == 1 else None,
         )
 
     # Layout contents plot
     ax_cont.set_title("Compounds")
     ax_cont.set_xlabel("Content [mass-%]")
-    ax_cont.legend()
     ax_cont.set_ylim(-120, 0)
     ax_cont.set_yticks(np.arange(-120, 10, 10), [None] * 13)
-    ax_cont.set_axisbelow(True)
-    ax_cont.grid(color="lightgrey")
+    handles, labels = ax_cont.get_legend_handles_labels()
+    ax_cont.legend(
+        [(handles[0], handles[1])] + handles[2:],
+        ["Organic matter\n(10-90% & median)"] + labels[2:],
+        handler_map={tuple: HandlerTuple(ndivide=1)},
+    )
 
     # Layout contents plot
     ax_ac.set_title("Acidity")
     ax_ac.set_xlabel("pH")
-    ax_ac.legend()
     ax_ac.set_ylim(-120, 0)
     ax_ac.set_yticks(np.arange(-120, 10, 10), [None] * 13)
-    ax_ac.set_axisbelow(True)
-    ax_ac.grid(color="lightgrey")
+    handles, labels = ax_ac.get_legend_handles_labels()
+    ax_ac.legend(
+        [(handles[0], handles[1])] + handles[2:],
+        ["pH\n(10-90% & median)"] + labels[2:],
+        handler_map={tuple: HandlerTuple(ndivide=1)},
+    )
 
 
 def plot_physical_data(ax_bd, ax_tex, data):
@@ -428,8 +443,6 @@ def plot_physical_data(ax_bd, ax_tex, data):
     ax_bd.set_xlabel("Bulk density [g/cm$^{3}$]")
     ax_bd.set_ylim(-120, 0)
     ax_bd.set_yticks(np.arange(-120, 10, 10), [None] * 13)
-    ax_bd.set_axisbelow(True)
-    ax_bd.grid(color="lightgrey")
 
     # Layout texture
     ax_tex.set_title("Texture")
@@ -439,8 +452,6 @@ def plot_physical_data(ax_bd, ax_tex, data):
     ax_tex.set_xticks(np.arange(0, 110, 20))
     ax_tex.set_ylim(-120, 0)
     ax_tex.set_yticks(np.arange(-120, 10, 10), [None] * 13)
-    ax_tex.set_axisbelow(True)
-    ax_tex.grid(color="lightgrey")
 
 
 def get_z(data, layer):
