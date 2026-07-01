@@ -1,0 +1,35 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: 'DutchSoils: Python package to get Dutch soil data'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: van den Brink
+    family-names: Mark
+    email: mark.vandenbrink@wur.nl
+    affiliation: Wageningen University
+    orcid: 'https://orcid.org/0009-0007-7642-0852'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21106157
+    description: Latest DutchSoils release at Zenodo
+repository-code: 'https://github.com/markvdbrink/dutchsoils'
+url: 'https://dutchsoils.readthedocs.io'
+abstract: >-
+  DutchSoils is a Python package to get soil data from the
+  Dutch Soil Map, Staring series and BOFEK clustering. It
+  contains code to get soil physical, textural, chemical
+  data from the Dutch Soil Map and combine that with the
+  BOFEK soil clustering and the hydraulic parameters from
+  the Staring series.
+keywords:
+  - soil physics
+  - soil chemistry
+  - soil hydrology
+  - modelling
+license: MIT
+date-released: '2025-05-01'
